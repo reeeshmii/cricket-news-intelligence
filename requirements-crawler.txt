@@ -1,0 +1,7 @@
+# Everything the web-crawler branch needs (the full requirements.txt adds the NLP/ML/dashboard stack)
+requests>=2.31
+trafilatura>=1.8
+beautifulsoup4>=4.12
+lxml>=5.0
+python-dotenv>=1.0
+pytest>=8.0
