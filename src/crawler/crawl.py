@@ -187,7 +187,8 @@ def main():
             finally:
                 store.close()
     except CrawlerBusy as e:
-        sys.exit(str(e))
+        print(f"Skipped: {e}")                  # not an error: the other crawl does the work
+        return
     if len(summary["errors"]) == len(sources):     # every source failed -> non-zero exit (CI shows red)
         sys.exit("all sources failed: " + "; ".join(f"{k}: {v}" for k, v in summary["errors"].items()))
 

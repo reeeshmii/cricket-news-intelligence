@@ -7,7 +7,7 @@ import pytest
 
 from src import config
 
-pytestmark = pytest.mark.skipif(not config.DATABASE_URL, reason="DATABASE_URL not set in .env")
+needs_db = pytest.mark.skipif(not config.DATABASE_URL, reason="DATABASE_URL not set in .env")
 
 
 @pytest.fixture
@@ -37,6 +37,7 @@ def _article(i):
             "scraped_at": datetime.now(timezone.utc).isoformat()}
 
 
+@needs_db
 def test_rolling_cap_and_seen_memory_persist(store_factory):
     s = store_factory(max_articles=3)
     evicted = sum(s.add(_article(i)) for i in range(5))
@@ -50,6 +51,7 @@ def test_rolling_cap_and_seen_memory_persist(store_factory):
     assert fresh.url_for_hash("hash4") == "https://s.test/4"
 
 
+@needs_db
 def test_crawl_twice_against_neon_inserts_once(store_factory):
     from src.crawler.crawl import crawl_source
     from tests.crawler.test_crawler import BODY, FakeSource, _page
@@ -61,6 +63,7 @@ def test_crawl_twice_against_neon_inserts_once(store_factory):
     assert second["new"] == 0 and second["already_seen"] == 2
 
 
+@needs_db
 def test_dry_run_writes_nothing_to_neon(store_factory):
     from src.crawler.crawl import crawl_source
     from tests.crawler.test_crawler import BODY, FakeSource, _page
@@ -78,6 +81,7 @@ def test_direct_dsn_strips_pooler_only_from_host():
     assert direct_dsn("postgresql://u:p@localhost/db") == "postgresql://u:p@localhost/db"
 
 
+@needs_db
 def test_only_one_writer_at_a_time(store_factory):
     from src.crawler.crawl import run_crawl
     from src.crawler.lock import CrawlerBusy

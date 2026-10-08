@@ -1,6 +1,7 @@
 """Article extraction: HTML -> {title, author, published_at, canonical_url, body}."""
 import json
 from datetime import datetime, timezone
+from urllib.parse import urljoin
 
 import trafilatura
 from bs4 import BeautifulSoup
@@ -51,7 +52,7 @@ def extract_article(html: str, url: str) -> dict | None:
         "author": _clean_author(_meta(soup, "author", "article:author"))
                   or _clean_author(_ld_author(ld)) or _clean_author(doc.get("author")),
         "published_at": published,
-        "canonical_url": canonical["href"] if canonical and canonical.get("href") else url,
+        "canonical_url": urljoin(url, canonical["href"].strip()) if canonical and canonical.get("href") else url,
         "body": doc["text"].strip(),
     }
 

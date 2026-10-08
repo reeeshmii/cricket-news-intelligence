@@ -43,9 +43,11 @@ def run_once(sources, limit, days, store_kind, max_articles=None) -> dict | None
     """One locked crawl cycle. Never raises: errors are logged and recorded in the status file."""
     try:
         with crawl_lock():
-            update_status(state="running", last_started_at=datetime.now(timezone.utc).isoformat())
             store = make_store(store_kind, max_articles)
             try:
+                if not store.try_lock():        # Neon: another machine is crawling right now
+                    raise CrawlerBusy(f"another crawl is writing to {store.location}")
+                update_status(state="running", last_started_at=datetime.now(timezone.utc).isoformat())
                 summary = run_crawl(sources, limit, days, store=store, echo=log.info)
             finally:
                 store.close()

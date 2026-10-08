@@ -174,3 +174,10 @@ def test_date_and_author_fall_back_to_json_ld_and_time_tag():
                           f'<body><time datetime="2026-10-08T09:00:00Z">today</time><article>{body}</article></body></html>',
                           "https://bbc.test/b")
     assert doc["published_at"] == "2026-10-08T09:00:00+00:00" and doc["author"] is None
+
+
+def test_relative_canonical_link_is_made_absolute():
+    body = "<p>" + " ".join(["IPL"] * 150) + "</p>"
+    doc = extract_article(f'<html><head><link rel="canonical" href="/cricket/story-1"></head>'
+                          f'<body><article>{body}</article></body></html>', "https://site.test/feed-link?x=1")
+    assert doc["canonical_url"] == "https://site.test/cricket/story-1"

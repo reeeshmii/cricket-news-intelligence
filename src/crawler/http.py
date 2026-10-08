@@ -76,5 +76,6 @@ class Fetcher:
                 last_err = f"HTTP {r.status_code}"
                 if r.status_code not in (429, 500, 502, 503, 504):
                     break                       # 403/404 etc: retrying will not help
-            time.sleep(self.delay * (2 ** attempt))
+            if attempt < self.retries:
+                time.sleep(self.delay * (2 ** attempt))
         raise FetchError(f"{url}: {last_err}")

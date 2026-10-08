@@ -96,7 +96,8 @@ are never fetched again. `seen_articles` itself is capped at 50,000 rows.
   so it starts after the crawler is merged into `main`.
 
 Only one crawl runs at a time: a file lock covers one machine, and a Postgres advisory lock
-covers laptop + Actions together. A failing site is logged and skipped; if every source
+covers laptop + Actions together (a run that finds the other one busy prints
+"Skipped" and exits normally). A failing site is logged and skipped; if every source
 fails, the command exits non-zero.
 
 ## Adding a source

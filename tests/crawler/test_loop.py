@@ -63,3 +63,16 @@ def test_one_failing_source_does_not_stop_the_others(monkeypatch, tmp_path):
     assert "site is down" in summary["errors"]["broken"]
     assert summary["sources"]["fake"]["new"] == 1
     assert LocalStore(tmp_path).count() == 1                         # saved despite the failure
+
+
+def test_busy_neon_lock_skips_cycle_without_marking_running(monkeypatch, tmp_path):
+    class BusyStore(LocalStore):
+        def try_lock(self):
+            return False
+
+    statuses = []
+    monkeypatch.setattr(loop_mod, "update_status", lambda **k: statuses.append(k))
+    monkeypatch.setattr(loop_mod, "crawl_lock", lambda: __import__("contextlib").nullcontext())
+    monkeypatch.setattr(loop_mod, "make_store", lambda *a: BusyStore(tmp_path))
+    assert loop_mod.run_once(["wisden"], 1, 1, "local") is None
+    assert not any(s.get("state") == "running" for s in statuses)
