@@ -161,3 +161,16 @@ def test_wisden_discovery_picks_newest_post_sitemap_and_filters_news():
     f = FakeFetcher({"https://w/index.xml": idx, "https://w/site-map/post/1.xml": post1})
     got = Wisden(sitemap_index="https://w/index.xml").discover(f)
     assert [c.url for c in got] == ["https://w/cricket-news/new", "https://w/cricket-news/old"]
+
+
+def test_date_and_author_fall_back_to_json_ld_and_time_tag():
+    body = "<p>" + " ".join(["IPL"] * 150) + "</p>"
+    ld = ('<script type="application/ld+json">{"@graph":[{"@type":"NewsArticle",'
+          '"datePublished":"2026-10-08T14:38:18.349Z","author":[{"@type":"Person","name":"Jane Doe"}]}]}</script>')
+    doc = extract_article(f"<html><head><title>IPL x</title>{ld}</head><body><article>{body}</article></body></html>",
+                          "https://bbc.test/a")
+    assert doc["published_at"] == "2026-10-08T14:38:18.349000+00:00" and doc["author"] == "Jane Doe"
+    doc = extract_article('<html><head><title>IPL x</title><meta name="author" content="https://fb.com/x"></head>'
+                          f'<body><time datetime="2026-10-08T09:00:00Z">today</time><article>{body}</article></body></html>',
+                          "https://bbc.test/b")
+    assert doc["published_at"] == "2026-10-08T09:00:00+00:00" and doc["author"] is None

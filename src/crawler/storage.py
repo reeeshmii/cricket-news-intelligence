@@ -36,6 +36,32 @@ class LocalStore:
             self._urls.setdefault(a["canonical_url"], "stored")
             self._hashes.setdefault(a["content_hash"], a["canonical_url"])
 
+    # ---- common store interface (shared with NeonStore) ------------------------------
+    @property
+    def location(self) -> str:
+        return str(self.dir)
+
+    def count(self) -> int:
+        return len(self.articles)
+
+    def seen_count(self) -> int:
+        return len(self._urls)
+
+    def rows(self) -> list[dict]:
+        """Article metadata for reports (bodies included here; harmless locally)."""
+        return self.articles
+
+    def recent_runs(self, n: int = 5) -> list[dict]:
+        if not self.log_path.exists():
+            return []
+        return [json.loads(line) for line in self.log_path.read_text("utf-8").splitlines()[-n:]]
+
+    def try_lock(self) -> bool:
+        return True                      # local runs are serialised by the file lock (lock.py)
+
+    def close(self) -> None:
+        pass
+
     # ---- lookups -------------------------------------------------------------------
     def seen_url(self, canonical_url: str) -> bool:
         return canonical_url in self._urls

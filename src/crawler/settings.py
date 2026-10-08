@@ -20,3 +20,6 @@ SEEN_MAX = int(os.environ.get("CRAWLER_SEEN_MAX", "50000"))
 
 # "the hundred" is dropped from the shared list: as plain text it matches ordinary Test reports.
 T20_KEYWORDS = [k for k in config.T20_KEYWORDS if k != "the hundred"] + ["twenty20"]
+
+# Where crawled articles go: "local" (data/*.jsonl) or "neon" (DATABASE_URL in .env)
+STORE = os.environ.get("CRAWLER_STORE", "local")
