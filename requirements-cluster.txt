@@ -1,0 +1,8 @@
+# Everything the cluster branch needs (no PyTorch: it reads embeddings from the database).
+psycopg[binary]>=3.1
+pgvector>=0.3
+python-dotenv>=1.0
+numpy>=1.26
+scikit-learn>=1.3        # HDBSCAN, KMeans, silhouette, Davies-Bouldin
+umap-learn>=0.5.7        # only used above 300 articles
+pytest>=8.0

@@ -1,0 +1,53 @@
+# Runs the cluster stage after every NLP run: assigns new articles to topics, re-fits the
+# topic model when needed, and refreshes trend history. Needs the secret DATABASE_URL.
+# Like all workflow_run triggers, this only fires from the default branch (main).
+name: cluster
+
+on:
+  workflow_run:
+    workflows: [nlp]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      refit:
+        description: "Force a full re-fit"
+        type: boolean
+        default: false
+
+concurrency:
+  group: cluster
+  cancel-in-progress: false
+
+jobs:
+  cluster:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-cluster.txt
+
+      - name: Install
+        run: pip install -r requirements-cluster.txt
+
+      - name: Tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m pytest tests/cluster -q
+
+      - name: Assign new articles / re-fit topics
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m src.cluster.run ${{ github.event.inputs.refit == 'true' && '--fit' || '' }}
+
+      - name: Topic report
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m src.cluster.report
+          python -m src.cluster.trends
