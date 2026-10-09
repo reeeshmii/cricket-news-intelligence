@@ -1,0 +1,540 @@
+{
+  "_comment": "Cricket vocabulary for entity recognition. TEAM/TOURNAMENT keys are canonical names; values are aliases (case-sensitive for short all-caps abbreviations). Edit freely: franchises get renamed.",
+  "TOURNAMENT": {
+    "Indian Premier League": [
+      "IPL",
+      "Indian Premier League",
+      "Tata IPL"
+    ],
+    "Women's Premier League": [
+      "WPL",
+      "Women's Premier League"
+    ],
+    "Big Bash League": [
+      "BBL",
+      "Big Bash League",
+      "Big Bash"
+    ],
+    "Women's Big Bash League": [
+      "WBBL",
+      "Women's Big Bash League",
+      "Women's Big Bash"
+    ],
+    "Pakistan Super League": [
+      "PSL",
+      "Pakistan Super League"
+    ],
+    "SA20": [
+      "SA20",
+      "SA20 League"
+    ],
+    "Caribbean Premier League": [
+      "CPL",
+      "Caribbean Premier League"
+    ],
+    "International League T20": [
+      "ILT20",
+      "International League T20",
+      "DP World ILT20"
+    ],
+    "Major League Cricket": [
+      "MLC",
+      "Major League Cricket"
+    ],
+    "The Hundred": [
+      "The Hundred",
+      "the Hundred"
+    ],
+    "T20 Blast": [
+      "T20 Blast",
+      "Vitality Blast",
+      "Vitality T20 Blast"
+    ],
+    "Bangladesh Premier League": [
+      "BPL",
+      "Bangladesh Premier League"
+    ],
+    "Lanka Premier League": [
+      "LPL",
+      "Lanka Premier League"
+    ],
+    "Super Smash": [
+      "Super Smash",
+      "Dream11 Super Smash"
+    ],
+    "Syed Mushtaq Ali Trophy": [
+      "Syed Mushtaq Ali Trophy",
+      "SMAT"
+    ],
+    "Men's T20 World Cup": [
+      "T20 World Cup",
+      "Men's T20 World Cup",
+      "ICC Men's T20 World Cup",
+      "T20 WC"
+    ],
+    "Women's T20 World Cup": [
+      "Women's T20 World Cup",
+      "ICC Women's T20 World Cup"
+    ],
+    "Asia Cup": [
+      "Asia Cup"
+    ]
+  },
+  "TEAM": {
+    "Chennai Super Kings": [
+      "Chennai Super Kings",
+      "CSK"
+    ],
+    "Mumbai Indians": [
+      "Mumbai Indians",
+      "MI"
+    ],
+    "Royal Challengers Bengaluru": [
+      "Royal Challengers Bengaluru",
+      "Royal Challengers Bangalore",
+      "Royal Challengers",
+      "RCB"
+    ],
+    "Kolkata Knight Riders": [
+      "Kolkata Knight Riders",
+      "KKR"
+    ],
+    "Sunrisers Hyderabad": [
+      "Sunrisers Hyderabad",
+      "SRH"
+    ],
+    "Delhi Capitals": [
+      "Delhi Capitals"
+    ],
+    "Rajasthan Royals": [
+      "Rajasthan Royals"
+    ],
+    "Punjab Kings": [
+      "Punjab Kings",
+      "PBKS"
+    ],
+    "Lucknow Super Giants": [
+      "Lucknow Super Giants",
+      "LSG"
+    ],
+    "Gujarat Titans": [
+      "Gujarat Titans"
+    ],
+    "Adelaide Strikers": [
+      "Adelaide Strikers"
+    ],
+    "Brisbane Heat": [
+      "Brisbane Heat"
+    ],
+    "Hobart Hurricanes": [
+      "Hobart Hurricanes"
+    ],
+    "Melbourne Renegades": [
+      "Melbourne Renegades"
+    ],
+    "Melbourne Stars": [
+      "Melbourne Stars"
+    ],
+    "Perth Scorchers": [
+      "Perth Scorchers"
+    ],
+    "Sydney Sixers": [
+      "Sydney Sixers"
+    ],
+    "Sydney Thunder": [
+      "Sydney Thunder"
+    ],
+    "Islamabad United": [
+      "Islamabad United"
+    ],
+    "Karachi Kings": [
+      "Karachi Kings"
+    ],
+    "Lahore Qalandars": [
+      "Lahore Qalandars"
+    ],
+    "Multan Sultans": [
+      "Multan Sultans"
+    ],
+    "Peshawar Zalmi": [
+      "Peshawar Zalmi"
+    ],
+    "Quetta Gladiators": [
+      "Quetta Gladiators"
+    ],
+    "Durban's Super Giants": [
+      "Durban's Super Giants",
+      "Durban Super Giants"
+    ],
+    "Joburg Super Kings": [
+      "Joburg Super Kings",
+      "JoBurg Super Kings",
+      "JSK"
+    ],
+    "MI Cape Town": [
+      "MI Cape Town"
+    ],
+    "Paarl Royals": [
+      "Paarl Royals"
+    ],
+    "Pretoria Capitals": [
+      "Pretoria Capitals"
+    ],
+    "Sunrisers Eastern Cape": [
+      "Sunrisers Eastern Cape"
+    ],
+    "Antigua and Barbuda Falcons": [
+      "Antigua and Barbuda Falcons",
+      "Antigua & Barbuda Falcons"
+    ],
+    "Barbados Royals": [
+      "Barbados Royals"
+    ],
+    "Guyana Amazon Warriors": [
+      "Guyana Amazon Warriors"
+    ],
+    "Saint Lucia Kings": [
+      "Saint Lucia Kings"
+    ],
+    "St Kitts and Nevis Patriots": [
+      "St Kitts and Nevis Patriots",
+      "St Kitts & Nevis Patriots"
+    ],
+    "Trinbago Knight Riders": [
+      "Trinbago Knight Riders"
+    ],
+    "Abu Dhabi Knight Riders": [
+      "Abu Dhabi Knight Riders"
+    ],
+    "Desert Vipers": [
+      "Desert Vipers"
+    ],
+    "Dubai Capitals": [
+      "Dubai Capitals"
+    ],
+    "Gulf Giants": [
+      "Gulf Giants"
+    ],
+    "MI Emirates": [
+      "MI Emirates"
+    ],
+    "Sharjah Warriorz": [
+      "Sharjah Warriorz",
+      "Sharjah Warriors"
+    ],
+    "Birmingham Phoenix": [
+      "Birmingham Phoenix"
+    ],
+    "London Spirit": [
+      "London Spirit"
+    ],
+    "Manchester Originals": [
+      "Manchester Originals"
+    ],
+    "Northern Superchargers": [
+      "Northern Superchargers"
+    ],
+    "Oval Invincibles": [
+      "Oval Invincibles"
+    ],
+    "Southern Brave": [
+      "Southern Brave"
+    ],
+    "Trent Rockets": [
+      "Trent Rockets"
+    ],
+    "Welsh Fire": [
+      "Welsh Fire"
+    ],
+    "Los Angeles Knight Riders": [
+      "Los Angeles Knight Riders",
+      "LA Knight Riders"
+    ],
+    "MI New York": [
+      "MI New York"
+    ],
+    "San Francisco Unicorns": [
+      "San Francisco Unicorns"
+    ],
+    "Seattle Orcas": [
+      "Seattle Orcas"
+    ],
+    "Texas Super Kings": [
+      "Texas Super Kings"
+    ],
+    "Washington Freedom": [
+      "Washington Freedom"
+    ]
+  },
+  "CRICKET_ORG": {
+    "BCCI": [
+      "BCCI",
+      "Board of Control for Cricket in India"
+    ],
+    "ICC": [
+      "ICC",
+      "International Cricket Council"
+    ],
+    "Cricket Australia": [
+      "Cricket Australia"
+    ],
+    "England and Wales Cricket Board": [
+      "ECB",
+      "England and Wales Cricket Board"
+    ],
+    "Pakistan Cricket Board": [
+      "PCB",
+      "Pakistan Cricket Board"
+    ],
+    "Cricket South Africa": [
+      "Cricket South Africa",
+      "CSA"
+    ],
+    "New Zealand Cricket": [
+      "New Zealand Cricket",
+      "NZC"
+    ],
+    "Sri Lanka Cricket": [
+      "Sri Lanka Cricket",
+      "SLC"
+    ],
+    "Bangladesh Cricket Board": [
+      "Bangladesh Cricket Board",
+      "BCB"
+    ],
+    "Cricket West Indies": [
+      "Cricket West Indies",
+      "CWI"
+    ],
+    "Australian Cricketers' Association": [
+      "Australian Cricketers' Association",
+      "Australian Cricketers Association",
+      "ACA"
+    ]
+  },
+  "_aliases_note": "Bare abbreviations shared by several franchises (DC, RR, GT) are left out on purpose: DC/RR/GT are ambiguous across leagues.",
+  "_national_note": "spaCy tags nations as places (GPE); in cricket news they are almost always the national team, so they count as TEAM. Aliases include scorecard codes. '<alias>-W' and '<name> Women' map to '<name> Women' automatically.",
+  "NATIONAL_TEAMS": {
+    "India": [
+      "India",
+      "IND"
+    ],
+    "Australia": [
+      "Australia",
+      "AUS"
+    ],
+    "England": [
+      "England",
+      "ENG"
+    ],
+    "Pakistan": [
+      "Pakistan",
+      "PAK"
+    ],
+    "South Africa": [
+      "South Africa",
+      "SA",
+      "RSA",
+      "Proteas"
+    ],
+    "New Zealand": [
+      "New Zealand",
+      "NZ",
+      "Black Caps",
+      "BlackCaps"
+    ],
+    "Sri Lanka": [
+      "Sri Lanka",
+      "SL"
+    ],
+    "Bangladesh": [
+      "Bangladesh",
+      "BAN"
+    ],
+    "West Indies": [
+      "West Indies",
+      "WI",
+      "Windies"
+    ],
+    "Afghanistan": [
+      "Afghanistan",
+      "AFG"
+    ],
+    "Zimbabwe": [
+      "Zimbabwe",
+      "ZIM"
+    ],
+    "Ireland": [
+      "Ireland",
+      "IRE"
+    ],
+    "Netherlands": [
+      "Netherlands",
+      "NED"
+    ],
+    "Scotland": [
+      "Scotland",
+      "SCO"
+    ],
+    "Nepal": [
+      "Nepal",
+      "NEP"
+    ],
+    "USA": [
+      "USA",
+      "United States"
+    ],
+    "UAE": [
+      "UAE",
+      "United Arab Emirates"
+    ],
+    "Oman": [
+      "Oman"
+    ],
+    "Namibia": [
+      "Namibia",
+      "NAM"
+    ],
+    "Canada": [
+      "Canada"
+    ],
+    "Uganda": [
+      "Uganda"
+    ],
+    "Papua New Guinea": [
+      "Papua New Guinea",
+      "PNG"
+    ]
+  },
+  "_stoplist_note": "Never reported as entities: formats, time zones, agencies, broadcasters, demonyms.",
+  "ENTITY_STOPLIST": [
+    "T20",
+    "T20I",
+    "T20Is",
+    "T20s",
+    "ODI",
+    "ODIs",
+    "Test",
+    "Tests",
+    "IST",
+    "GMT",
+    "BST",
+    "AEST",
+    "AEDT",
+    "PST",
+    "EST",
+    "PKT",
+    "SLST",
+    "Live",
+    "Digital",
+    "Live Streaming",
+    "Super Over",
+    "Player of the Match",
+    "PTI",
+    "ANI",
+    "IANS",
+    "Reuters",
+    "AFP",
+    "AP",
+    "Getty Images",
+    "Getty",
+    "Wisden",
+    "CricTracker",
+    "Cricket Addictor",
+    "Hindustan Times",
+    "Indian Express",
+    "The Guardian",
+    "BBC",
+    "BBC Sport",
+    "Instagram",
+    "Twitter",
+    "Facebook",
+    "YouTube",
+    "WhatsApp",
+    "Telegram",
+    "JioHotstar",
+    "Hotstar",
+    "Disney+ Hotstar",
+    "JioCinema",
+    "SonyLIV",
+    "Sony Sports Network",
+    "Star Sports",
+    "FanCode",
+    "PTV Sports",
+    "Tapmad",
+    "Sky Sports",
+    "Fox Cricket",
+    "Kayo",
+    "Willow",
+    "Prime Video",
+    "Indian",
+    "Pakistani",
+    "Australian",
+    "English",
+    "Sri Lankan",
+    "Bangladeshi",
+    "Afghan",
+    "South African",
+    "New Zealander",
+    "Kiwi",
+    "Kiwis",
+    "West Indian",
+    "Zimbabwean",
+    "Irish",
+    "Dutch",
+    "Scottish",
+    "Nepali",
+    "Emirati",
+    "Namibian",
+    "Canadian",
+    "American"
+  ],
+  "DOMAIN_STOPWORDS": [
+    "cricket",
+    "match",
+    "game",
+    "team",
+    "player",
+    "play",
+    "series",
+    "season",
+    "say",
+    "said",
+    "tell",
+    "told",
+    "also",
+    "one",
+    "two",
+    "three",
+    "first",
+    "second",
+    "last",
+    "get",
+    "take",
+    "make",
+    "go",
+    "come",
+    "year",
+    "day",
+    "time",
+    "week",
+    "month",
+    "would",
+    "could",
+    "will",
+    "may",
+    "like",
+    "just",
+    "read",
+    "also_read",
+    "click",
+    "follow",
+    "update",
+    "live",
+    "image",
+    "photo",
+    "getty",
+    "pti",
+    "ani"
+  ]
+}

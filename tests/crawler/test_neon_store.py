@@ -89,5 +89,11 @@ def test_only_one_writer_at_a_time(store_factory):
     assert first.try_lock()
     with pytest.raises(CrawlerBusy):
         run_crawl([], store=second, echo=lambda *_: None)
-    first.close()                                   # lock released with the connection
-    assert second.try_lock()
+    first.close()                                   # lock released with the connection...
+    import time
+    for _ in range(20):                             # ...once the server has ended that session
+        if second.try_lock():
+            break
+        time.sleep(0.25)
+    else:
+        pytest.fail("advisory lock was not released after closing the first connection")

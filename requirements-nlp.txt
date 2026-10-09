@@ -1,0 +1,12 @@
+# Everything the nlp branch needs (on top of the database helper).
+# On Linux/CI install CPU-only PyTorch first to avoid ~2 GB of CUDA libraries:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+psycopg[binary]>=3.1
+pgvector>=0.3
+python-dotenv>=1.0
+spacy>=3.8
+sentence-transformers>=3.0
+vaderSentiment>=3.3
+yake>=0.4.8
+pytest>=8.0
+# then: python -m spacy download en_core_web_md
