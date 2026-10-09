@@ -1,0 +1,50 @@
+# Runs the NLP stage right after every crawler run, so new articles get entities, sentiment,
+# keywords and embeddings automatically. Needs the repository secret DATABASE_URL.
+# Like all workflow_run / schedule triggers, this only fires from the default branch (main).
+name: nlp
+
+on:
+  workflow_run:
+    workflows: [crawler]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: nlp
+  cancel-in-progress: false
+
+jobs:
+  nlp:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-nlp.txt
+
+      - name: Cache models (spaCy wheel is pip-cached; this keeps the sentence-transformer)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-all-MiniLM-L6-v2
+
+      - name: Install (CPU-only PyTorch)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements-nlp.txt
+          python -m spacy download en_core_web_md
+
+      - name: Tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m pytest tests/nlp -q
+
+      - name: Process new articles
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m src.nlp.run
