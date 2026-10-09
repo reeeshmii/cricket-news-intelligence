@@ -14,17 +14,6 @@ EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # 384-d
 ASSIGN_MIN_SIMILARITY = 0.35  # below this a new article goes to the "emerging" pool
 REFIT_WINDOW_DAYS = 90
 
-# Feed/sitemap URLs change over time -- VERIFY each one and check robots.txt / ToS
-# before crawling. Add or remove sources here; no other code changes needed.
-SOURCES = [
-    {"name": "ESPNcricinfo", "base_url": "https://www.espncricinfo.com",
-     "feeds": ["https://www.espncricinfo.com/rss/content/story/feeds/0.xml"]},
-    {"name": "Cricbuzz", "base_url": "https://www.cricbuzz.com",
-     "feeds": ["https://www.cricbuzz.com/rss-feed/cricket-news"]},   # verify; may need sitemap
-    {"name": "Wisden", "base_url": "https://wisden.com",
-     "feeds": ["https://wisden.com/feed"]},
-]
-
 # Cheap relevance gate on title/summary/body (lowercase substrings)
 T20_KEYWORDS = ["t20", "ipl", "indian premier league", "big bash", "bbl", "psl",
                 "pakistan super league", "sa20", "cpl", "caribbean premier league",
