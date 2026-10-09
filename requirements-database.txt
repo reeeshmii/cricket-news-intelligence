@@ -1,0 +1,5 @@
+# Everything the database branch needs (connection helper, schema setup, tests)
+psycopg[binary]>=3.1
+pgvector>=0.3
+python-dotenv>=1.0
+pytest>=8.0
