@@ -1,12 +1,4 @@
-# Everything the dashboard API needs (the React frontend has its own frontend/package.json).
-fastapi>=0.115
-uvicorn[standard]>=0.30
-psycopg[binary]>=3.1
-psycopg-pool>=3.2
-pgvector>=0.3
-python-dotenv>=1.0
-numpy>=1.26
-scikit-learn>=1.3        # PCA fallback for the 2-D map
-umap-learn>=0.5.7        # 2-D map of the article embeddings
-httpx>=0.27              # FastAPI TestClient (tests)
+# The dashboard API plus its tests. (The React frontend has its own frontend/package.json.)
+-r requirements.txt
+httpx>=0.27              # FastAPI TestClient
 pytest>=8.0

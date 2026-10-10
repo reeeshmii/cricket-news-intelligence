@@ -76,6 +76,24 @@ def test_articles_carry_image_and_summary(client):
     assert "image_url" in item and item["summary"] == "b"                  # test bodies are just "b"
 
 
+def test_serverless_mode_uses_one_connection_per_request(client, monkeypatch):
+    """On Vercel there is no pool: each request opens and closes its own connection."""
+    from src.api import db as api_db
+    monkeypatch.setattr(api_db, "SERVERLESS", True)
+    assert client.get("/api/status").json()["articles"] == 20
+    assert client.get("/api/topics/map?method=pca").json()["method"] == "pca"
+
+
+def test_vercel_entry_point_exposes_the_app():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("vercel_entry", Path(__file__).resolve().parents[2] / "api" / "index.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    from src.api.app import app
+    assert mod.app is app
+
+
 def test_map_projection_can_be_chosen(client):
     assert client.get("/api/topics/map?method=pca").json()["method"] == "pca"
     assert client.get("/api/topics/map?method=tsne").status_code == 422

@@ -1,0 +1,8 @@
+# The whole system in one environment (local development). Each stage also has its own file;
+# requirements.txt is only the deployed dashboard API (what Vercel installs).
+-r requirements-crawler.txt
+-r requirements-database.txt
+-r requirements-nlp.txt
+-r requirements-cluster.txt
+-r requirements-dashboard.txt
+# then: python -m spacy download en_core_web_md

@@ -1,0 +1,10 @@
+# Not needed by the deployed dashboard (the pipeline runs on GitHub Actions)
+.venv
+**/__pycache__
+.pytest_cache
+.claude
+.github
+data
+tests
+frontend/node_modules
+frontend/dist

@@ -56,7 +56,9 @@ The report shows this comparison for every fitted model (`python -m src.cluster.
 3. **Stable topics.** On re-fit, each new topic is matched to an old one by centroid similarity
    (≥ 0.75) and inherits its `stable_key`. "SA20 auction" stays the same topic across models,
    and its trend line continues.
-4. **Trend history.** `refresh_topic_daily_stats()` copies per-day counts into
+4. **Dashboard map.** The 2-D UMAP and PCA coordinates of every embedded article are stored in
+   `article_projection` (`projection.py`), so the deployed API only reads numbers.
+5. **Trend history.** `refresh_topic_daily_stats()` copies per-day counts into
    `topic_daily_stats`, which survives the crawler's rolling cap.
 
 Older models keep their topics and trend rows. Their per-article rows are pruned after 3 models.

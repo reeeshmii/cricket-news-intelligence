@@ -52,3 +52,29 @@ cd frontend && npm run dev                        # app on http://localhost:5173
 ```
 
 Tests: `.venv/Scripts/python -m pytest tests/api -q` (runs in a throwaway Neon schema).
+
+## Deploy on Vercel
+
+The React app is served as static files; the FastAPI app runs as one Python serverless function
+(`api/index.py`). The crawler, NLP and clustering keep running on GitHub Actions and write to Neon,
+so the hosted dashboard always shows the latest data.
+
+| file | role |
+|---|---|
+| `vercel.json` | builds `frontend/`, serves `frontend/dist`, sends `/api/*` to `api/index.py`, everything else to the React app |
+| `api/index.py` | exposes `src/api/app.py` to Vercel |
+| `requirements.txt` | the API's dependencies only (about 50 MB, no ML libraries); the full pipeline is in `requirements-all.txt` |
+| `.vercelignore` | keeps `.venv`, tests, data and `node_modules` out of the upload |
+
+The API needs no machine-learning libraries because the cluster stage stores the 2-D map
+coordinates (`article_projection`). On Vercel (env `VERCEL` set) each request opens one short
+connection through Neon's pooled endpoint; locally a small connection pool is used.
+
+Steps:
+
+1. Merge everything into `main` and push.
+2. On vercel.com: **Add New → Project**, import the GitHub repository. Leave the framework preset
+   as **Other**; `vercel.json` supplies the build settings.
+3. **Settings → Environment Variables**: add `DATABASE_URL` = the Neon connection string with the
+   `-pooler` host, for Production (and Preview if you use preview deployments).
+4. **Deploy.** Every push to `main` redeploys automatically.

@@ -39,7 +39,7 @@ Each stage reads only the rows waiting for it (`articles.status`: `cleaned` → 
 
 ```bash
 python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements.txt
+.venv/Scripts/python -m pip install -r requirements-all.txt
 .venv/Scripts/python -m spacy download en_core_web_md
 copy .env.example .env          # paste your Neon connection string as DATABASE_URL
 .venv/Scripts/python -m src.init_db
@@ -52,6 +52,7 @@ cd frontend && npm install && npm run build && cd ..
 |---|---|
 | whole pipeline once | `.venv/Scripts/python run_pipeline.py` |
 | dashboard | `.venv/Scripts/python -m src.api` → http://localhost:8000 |
+| dashboard online | Vercel: see [frontend/README.md](frontend/README.md#deploy-on-vercel) |
 | crawl continuously | `.venv/Scripts/python -m src.crawler.loop --every 30 --store neon` |
 | NLP continuously | `.venv/Scripts/python -m src.nlp.run --every 15` |
 | topics continuously | `.venv/Scripts/python -m src.cluster.run --every 30` |

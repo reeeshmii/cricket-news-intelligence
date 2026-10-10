@@ -119,6 +119,17 @@ CREATE TABLE IF NOT EXISTS article_clusters (
 );
 CREATE INDEX IF NOT EXISTS idx_article_clusters_cluster ON article_clusters(cluster_id);
 
+-- 2-D coordinates of each article's embedding for the dashboard map (UMAP and PCA).
+-- Computed by the cluster stage, so the deployed API needs no machine-learning libraries.
+CREATE TABLE IF NOT EXISTS article_projection (
+    article_id  BIGINT NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+    method      TEXT   NOT NULL CHECK (method IN ('umap', 'pca')),
+    x           REAL   NOT NULL,                       -- scaled to 0..1
+    y           REAL   NOT NULL,
+    computed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (article_id, method)
+);
+
 -- Per-day topic counts that survive the crawler's rolling cap (trend history).
 CREATE TABLE IF NOT EXISTS topic_daily_stats (
     day           DATE NOT NULL,
