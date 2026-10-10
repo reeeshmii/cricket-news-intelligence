@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useApi } from "../api.js";
 import { Card, Notice, Pager, Topbar, TopicChip } from "../components.jsx";
 import { addDays, fmtDate, fmtNum, isoDay, sourceName } from "../format.js";
-import { IconCalendar, IconExternal, IconImage, IconRefresh, IconSearch } from "../icons.jsx";
+import { IconCalendar, IconExternal, IconRefresh, IconSearch } from "../icons.jsx";
 
 const SORTS = [
   { value: "newest", label: "Newest First" },
@@ -30,17 +30,6 @@ function useUrlState() {
     setParams(Object.fromEntries(Object.entries(next).filter(([k, v]) => v !== "" && v !== DEFAULTS[k])), { replace: true });
   };
   return [state, update];
-}
-
-function Thumb({ src, alt }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className="thumb">
-      {src && !failed
-        ? <img src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
-        : <IconImage size={26} />}
-    </div>
-  );
 }
 
 export default function LatestNews() {
@@ -115,7 +104,6 @@ export default function LatestNews() {
           <div className="news-list">
             {data.items.map((a) => (
               <article key={a.id} className="card news-item">
-                <Thumb src={a.image_url} alt="" />
                 <div style={{ minWidth: 0 }}>
                   <h3><a href={a.url} target="_blank" rel="noopener noreferrer">{a.title}</a></h3>
                   {a.summary && <p className="summary">{a.summary}</p>}
