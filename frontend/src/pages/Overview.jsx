@@ -6,13 +6,12 @@ import { Card, ChartCard, HBars, KpiCard, Notice, SimpleTable, Topbar, TopicChip
 import { fmtDate, fmtDay, fmtNum, fmtUpdated, fmtWeek, sourceName, timeAgo, toWeeks } from "../format.js";
 import { IconArrowRight, IconCalendar, IconDatabase, IconDoc, IconRefresh, IconTopics, IconTrendUp, IconUp } from "../icons.jsx";
 
-const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", cream: "#BCA581", sand: "#E6D9C7", white: "#FFFFFF" };
-// Colour follows the source, never its rank, so a period change never repaints a source.
-// Slices are drawn in this fixed order so neighbours always differ enough (sage and pale sage
-// are too alike to sit side by side, so the donut uses tan cream instead of pale sage).
-const SOURCE_ORDER = ["hindustantimes", "wisden", "crictracker", "cricketaddictor"];
-const SOURCE_COLOR = { hindustantimes: C.sage, wisden: C.forest, crictracker: C.cream, cricketaddictor: C.sand };
-const byFixedOrder = (rows) => [...rows].sort((a, b) => SOURCE_ORDER.indexOf(a.source) - SOURCE_ORDER.indexOf(b.source));
+const C = { forest: "#2E4634", sand: "#E6D9C7", white: "#FFFFFF", g1: "#4B6043", g2: "#658354", g3: "#75975E", g4: "#87AB69" };
+// The four chart greens are one hue in four lightness steps: they read as an ORDER, not as four
+// separate identities (neighbouring shades are too close for that). So the donut is ordered by
+// share: largest source darkest. The legend lists sources in the same order with every value.
+const RAMP = [C.g1, C.g2, C.g3, C.g4];
+const shade = (i) => RAMP[i] ?? C.sand;
 const PERIODS = [
   { value: "1", label: "Last 24 hours" },
   { value: "7", label: "Last 7 days" },
@@ -39,9 +38,9 @@ function SourceDonut({ rows, total, loading }) {
           <div role="img" aria-label="Donut chart of articles by source; values listed beside it" style={{ width: 150, height: 150 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={byFixedOrder(rows)} dataKey="articles" nameKey="source" innerRadius={46} outerRadius={72} startAngle={90} endAngle={-270}
+                <Pie data={rows} dataKey="articles" nameKey="source" innerRadius={46} outerRadius={72} startAngle={90} endAngle={-270}
                      stroke={C.white} strokeWidth={2} isAnimationActive={false}>
-                  {byFixedOrder(rows).map((r) => <Cell key={r.source} fill={SOURCE_COLOR[r.source] ?? C.sand} />)}
+                  {rows.map((r, i) => <Cell key={r.source} fill={shade(i)} />)}
                 </Pie>
                 <Tooltip isAnimationActive={false} content={({ active, payload }) => active && payload?.length ? (
                   <div className="tooltip"><div className="t-row"><span className="k strong" />
@@ -52,9 +51,9 @@ function SourceDonut({ rows, total, loading }) {
             </ResponsiveContainer>
           </div>
           <div className="legend-rows">
-            {rows.map((r) => (
+            {rows.map((r, i) => (
               <div className="legend-row" key={r.source}>
-                <span className="sw" style={{ background: SOURCE_COLOR[r.source] ?? C.sand }} aria-hidden="true" />
+                <span className="sw" style={{ background: shade(i) }} aria-hidden="true" />
                 <span>
                   <span className="name">{sourceName(r.source)}</span>
                   <span className="val"><strong>{pct(r.articles, total)}%</strong> ({fmtNum(r.articles)})</span>
@@ -168,9 +167,9 @@ export default function Overview() {
                   <XAxis dataKey="day" tickFormatter={weekly ? fmtWeek : fmtDay} stroke={C.sand} tickLine={false} minTickGap={18} />
                   <YAxis allowDecimals={false} stroke={C.sand} tickLine={false} axisLine={false} width={42} />
                   <Tooltip content={<TimeTip weekly={weekly} />} cursor={{ stroke: C.forest, strokeWidth: 1 }} isAnimationActive={false} />
-                  <Area type="linear" dataKey="articles" stroke={C.forest} strokeWidth={2} fill={C.sage} fillOpacity={0.18}
-                        dot={{ r: 4, fill: C.forest, stroke: C.white, strokeWidth: 2 }}
-                        activeDot={{ r: 5.5, fill: C.forest, stroke: C.white, strokeWidth: 2 }} isAnimationActive={false} />
+                  <Area type="linear" dataKey="articles" stroke={C.g1} strokeWidth={2} fill={C.g4} fillOpacity={0.22}
+                        dot={{ r: 4, fill: C.g1, stroke: C.white, strokeWidth: 2 }}
+                        activeDot={{ r: 5.5, fill: C.g1, stroke: C.white, strokeWidth: 2 }} isAnimationActive={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

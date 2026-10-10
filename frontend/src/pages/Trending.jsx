@@ -5,7 +5,7 @@ import { Card, ChartCard, HBars, Notice, SimpleTable, Topbar } from "../componen
 import { addDays, fmtDay, fmtNum, fmtWeek, sourceName, toWeeks } from "../format.js";
 import { IconCalendar } from "../icons.jsx";
 
-const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", sand: "#E6D9C7", white: "#FFFFFF" };
+const C = { forest: "#2E4634", sand: "#E6D9C7", white: "#FFFFFF", g1: "#4B6043", g2: "#658354", g3: "#75975E", g4: "#87AB69" };
 const RANGES = [
   { value: "7", label: "Last 7 days" },
   { value: "14", label: "Last 14 days" },
@@ -146,12 +146,12 @@ export default function Trending() {
                            label={{ value: "Number of articles", angle: -90, position: "insideLeft", offset: 14, fill: C.forest, fontSize: 12 }} />
                     <Tooltip content={<TrendTip labels={labels} focus={focus} weekly={weekly} />} cursor={{ stroke: C.forest, strokeWidth: 1 }} isAnimationActive={false} />
                     {shown.filter((t) => t.stable_key !== focus).map((t) => (
-                      <Line key={t.stable_key} dataKey={t.stable_key} type="linear" stroke={C.pale} strokeWidth={1.6} dot={false} activeDot={false} isAnimationActive={false} />
+                      <Line key={t.stable_key} dataKey={t.stable_key} type="linear" stroke={C.g4} strokeWidth={1.6} strokeOpacity={0.8} dot={false} activeDot={false} isAnimationActive={false} />
                     ))}
                     {shown.filter((t) => t.stable_key === focus).map((t) => (
-                      <Line key={t.stable_key} dataKey={t.stable_key} type="linear" stroke={C.forest} strokeWidth={2.5}
-                            dot={{ r: 3.5, fill: C.forest, stroke: C.white, strokeWidth: 1.5 }}
-                            activeDot={{ r: 5, fill: C.forest, stroke: C.white, strokeWidth: 2 }} isAnimationActive={false} />
+                      <Line key={t.stable_key} dataKey={t.stable_key} type="linear" stroke={C.g1} strokeWidth={2.5}
+                            dot={{ r: 3.5, fill: C.g1, stroke: C.white, strokeWidth: 1.5 }}
+                            activeDot={{ r: 5, fill: C.g1, stroke: C.white, strokeWidth: 2 }} isAnimationActive={false} />
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
