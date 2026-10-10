@@ -23,7 +23,7 @@ from psycopg.types.json import Jsonb
 
 from ..db import connect
 from . import labels as lb
-from . import model, settings
+from . import model, projection, settings
 
 
 class ClusterBusy(Exception):
@@ -41,9 +41,7 @@ ORDER BY a.id
 """
 
 
-def _vec(v) -> np.ndarray:
-    """pgvector returns Vector objects (or arrays, depending on the version)."""
-    return np.asarray(v.to_numpy() if hasattr(v, "to_numpy") else v, dtype=np.float32)
+_vec = model.as_array
 
 
 def active_model(conn):
@@ -130,6 +128,7 @@ def fit(conn, algorithm: str = "hdbscan", dry_run: bool = False, echo=print) -> 
                             SELECT id FROM cluster_models ORDER BY id DESC LIMIT %s))""",
                      (settings.KEEP_ASSIGNMENTS_FOR_MODELS,))
     refreshed = conn.execute("SELECT refresh_topic_daily_stats()").fetchone()[0]
+    projection.refresh(conn, echo)
     echo(f"fit: model {model_id} active; {params['carried_over_topics']} topics carried over; "
          f"{refreshed} daily trend rows refreshed")
     return {"model_id": model_id, "params": params, "topics": topics}
@@ -168,6 +167,7 @@ def assign(conn, dry_run: bool = False, echo=print) -> dict | None:
         conn.execute("UPDATE clusters c SET size = (SELECT count(*) FROM article_clusters ac "
                      "WHERE ac.cluster_id = c.id) WHERE c.model_id = %s", (model_id,))
     conn.execute("SELECT refresh_topic_daily_stats()")
+    projection.refresh(conn, echo)
     return {"assigned": len(assigned), "emerging": len(emerging)}
 
 
@@ -213,7 +213,14 @@ def run_once(mode: str = "auto", algorithm: str = "hdbscan", dry_run: bool = Fal
         assigned = result.get("assign") or {}
         if not result.get("fit") and not assigned.get("assigned") and not assigned.get("emerging"):
             echo("nothing new to cluster")
+        _keep_map_current(conn, dry_run, echo)
         return result
+
+
+def _keep_map_current(conn, dry_run: bool, echo) -> None:
+    """Articles removed by the crawler's rolling cap (or a first run) leave the map stale."""
+    if not dry_run and projection.is_stale(conn):
+        projection.refresh(conn, echo)
 
 
 def main():

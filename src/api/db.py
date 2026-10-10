@@ -1,40 +1,43 @@
-"""Connection pool for the API.
+"""Database connections for the API.
 
-Uses Neon's pooled endpoint (many short queries, no session-level SET). Tests set
-API_DB_SCHEMA to point every connection at a throwaway schema; that goes through the
+Locally (python -m src.api): a small connection pool, so requests reuse connections.
+On Vercel (serverless, env VERCEL is set): one short connection per request through Neon's
+pooled endpoint, because function instances start, freeze and stop at any time.
+
+Tests set API_DB_SCHEMA to point every connection at a throwaway schema; that goes through the
 direct endpoint with a startup option, so nothing leaks to other clients.
 """
 import os
 from contextlib import contextmanager
 
-from pgvector.psycopg import register_vector
+import psycopg
 from psycopg.rows import dict_row
-from psycopg_pool import ConnectionPool
 
 from .. import config
 from ..db import direct_dsn
 
-_pool: ConnectionPool | None = None
+SERVERLESS = bool(os.environ.get("VERCEL"))
+_pool = None
 
 
-def _configure(conn) -> None:
-    try:
-        register_vector(conn)              # embeddings for the 2-D map
-    except Exception:                      # extension missing: everything else still works
-        pass
+def _dsn_and_options() -> tuple[str, dict]:
+    if not config.DATABASE_URL:
+        raise RuntimeError("DATABASE_URL is not set (see .env.example)")
+    dsn = config.DATABASE_URL
+    # prepare_threshold=None: no server-side prepared statements, safe behind PgBouncer
+    kwargs = {"autocommit": True, "row_factory": dict_row, "connect_timeout": 15, "prepare_threshold": None}
+    if schema := os.environ.get("API_DB_SCHEMA"):
+        dsn = direct_dsn(dsn)
+        kwargs["options"] = f"-c search_path={schema},public"
+    return dsn, kwargs
 
 
-def pool() -> ConnectionPool:
+def _get_pool():
     global _pool
     if _pool is None:
-        if not config.DATABASE_URL:
-            raise RuntimeError("DATABASE_URL is not set (see .env.example)")
-        dsn = config.DATABASE_URL
-        kwargs = {"autocommit": True, "row_factory": dict_row, "connect_timeout": 20}
-        if schema := os.environ.get("API_DB_SCHEMA"):
-            dsn = direct_dsn(dsn)
-            kwargs["options"] = f"-c search_path={schema},public"
-        _pool = ConnectionPool(dsn, min_size=1, max_size=6, kwargs=kwargs, configure=_configure,
+        from psycopg_pool import ConnectionPool
+        dsn, kwargs = _dsn_and_options()
+        _pool = ConnectionPool(dsn, min_size=1, max_size=6, kwargs=kwargs,
                                check=ConnectionPool.check_connection,   # Neon may drop idle connections
                                timeout=30, open=True)
     return _pool
@@ -42,8 +45,13 @@ def pool() -> ConnectionPool:
 
 @contextmanager
 def connection():
-    with pool().connection() as conn:
-        yield conn
+    if SERVERLESS:
+        dsn, kwargs = _dsn_and_options()
+        with psycopg.connect(dsn, **kwargs) as conn:
+            yield conn
+    else:
+        with _get_pool().connection() as conn:
+            yield conn
 
 
 def close() -> None:

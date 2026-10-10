@@ -2,6 +2,7 @@
 
   python -m src.api                 # http://localhost:8000  (serves frontend/dist when built)
   python -m src.api --reload        # development
+On Vercel, api/index.py exposes this same app as a serverless function (see vercel.json).
 
 Endpoints (all JSON, all read-only):
   /api/status      cheap "has anything changed?" version + last refresh times (polled by the UI)
@@ -9,7 +10,7 @@ Endpoints (all JSON, all read-only):
   /api/overview    KPIs, distributions by source and topic, recently collected articles
   /api/articles    search / filter / sort / paginate
   /api/topics      active topic model: topics, keywords, entities, headlines, evaluation
-  /api/topics/map  2-D projection of the article embeddings
+  /api/topics/map  2-D map of the article embeddings (stored by the cluster stage)
   /api/trends      topic frequency over time, volume vs growth
 """
 from contextlib import asynccontextmanager
@@ -23,25 +24,12 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import db, queries
-from .embedding_map import embedding_map
 
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
 
-def _warm_map() -> None:
-    """UMAP compiles itself (numba) on first use, ~30 s; do it before anyone opens the map."""
-    try:
-        with db.connection() as conn:
-            model_id, rows = queries.embedding_rows(conn)
-        embedding_map(model_id, rows)
-    except Exception:
-        pass                                       # the map endpoint will report real errors
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    import threading
-    threading.Thread(target=_warm_map, daemon=True).start()
     yield
     db.close()
 
@@ -94,8 +82,7 @@ def topics():
 @app.get("/api/topics/map")
 def topics_map(method: Literal["umap", "pca"] = "umap"):
     with db.connection() as conn:
-        model_id, rows = queries.embedding_rows(conn)
-    return embedding_map(model_id, rows, method)
+        return queries.projection(conn, method)
 
 
 @app.get("/api/trends")

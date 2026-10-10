@@ -205,17 +205,18 @@ def topics(conn) -> dict:
     }
 
 
-def embedding_rows(conn) -> tuple[int, list[dict]]:
-    model = _model_id(conn)
+def projection(conn, method: str) -> dict:
+    """Stored 2-D map coordinates (computed by the cluster stage) + each article's cluster."""
     rows = conn.execute("""
-        SELECT a.id, a.title, s.name AS source, v.embedding, t.cluster_id
-        FROM articles a
-        JOIN article_vectors v ON v.article_id = a.id
-        JOIN sources s ON s.id = a.source_id
+        SELECT a.id, a.title, s.name AS source, p.x, p.y, t.cluster_id
+        FROM article_projection p
+        JOIN articles a ON a.id = p.article_id
+        JOIN sources s  ON s.id = a.source_id
         LEFT JOIN LATERAL (SELECT ac.cluster_id FROM article_clusters ac JOIN clusters c ON c.id = ac.cluster_id
-                           WHERE ac.article_id = a.id AND c.model_id = %s LIMIT 1) t ON TRUE
-        WHERE a.duplicate_of IS NULL ORDER BY a.id""", (model,)).fetchall()
-    return model, rows
+                           WHERE ac.article_id = a.id AND c.model_id = %(model)s LIMIT 1) t ON TRUE
+        WHERE p.method = %(method)s ORDER BY a.id""", {"model": _model_id(conn), "method": method}).fetchall()
+    return {"method": method if rows else None,
+            "points": [{**r, "x": round(float(r["x"]), 4), "y": round(float(r["y"]), 4)} for r in rows]}
 
 
 # ------------------------------------------------------------------ trends

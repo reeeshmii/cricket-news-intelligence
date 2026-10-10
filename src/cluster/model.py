@@ -21,6 +21,11 @@ class TopicFit:
     params: dict = field(default_factory=dict)
 
 
+def as_array(v) -> np.ndarray:
+    """pgvector returns Vector objects (or arrays, depending on the version)."""
+    return np.asarray(v.to_numpy() if hasattr(v, "to_numpy") else v, dtype=np.float32)
+
+
 def normalise(X: np.ndarray) -> np.ndarray:
     return X / np.clip(np.linalg.norm(X, axis=1, keepdims=True), 1e-12, None)
 

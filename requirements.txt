@@ -1,7 +1,8 @@
-# The whole system in one environment. Each stage also has its own, smaller file.
--r requirements-crawler.txt
--r requirements-database.txt
--r requirements-nlp.txt
--r requirements-cluster.txt
--r requirements-dashboard.txt
-# then: python -m spacy download en_core_web_md
+# The deployed dashboard API (Vercel installs this file; keep it small).
+# The whole pipeline (crawler, NLP, clustering) is in requirements-all.txt.
+fastapi>=0.115
+uvicorn>=0.30            # local server only: python -m src.api
+psycopg[binary]>=3.1
+psycopg-pool>=3.2        # local connection pool (not used on Vercel)
+pgvector>=0.3
+python-dotenv>=1.0

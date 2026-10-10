@@ -188,6 +188,28 @@ def test_fit_assign_refit_keeps_topics_and_trends(conn):
 
 
 @needs_db
+def test_map_coordinates_are_stored_and_follow_deletions(conn):
+    """The dashboard map reads stored coordinates; they must cover exactly the embedded articles."""
+    from src.cluster import projection, run
+    X, truth, _ = blobs(3, 6, seed=8)
+    _add(conn, X, truth, "m")
+    run.fit(conn, echo=lambda *_: None)                                       # fit stores the map
+    counts = dict(conn.execute("SELECT method, count(*) FROM article_projection GROUP BY 1").fetchall())
+    assert counts == {"umap": 18, "pca": 18} and not projection.is_stale(conn)
+    xs = [r[0] for r in conn.execute("SELECT x FROM article_projection WHERE method = 'pca'")]
+    assert min(xs) == 0 and max(xs) == 1                                      # scaled to 0..1
+
+    conn.execute("DELETE FROM articles WHERE id = (SELECT min(id) FROM articles)")   # rolling cap removes one
+    assert conn.execute("SELECT count(*) FROM article_projection").fetchone()[0] == 34   # its points went with it
+    assert not projection.is_stale(conn)                                     # remaining points stay valid
+
+    new = model.normalise(np.random.default_rng(3).normal(size=(1, DIM))).astype(np.float32)
+    _add(conn, new, [0], "n")                                                # embedded, not yet on the map
+    assert projection.is_stale(conn)
+    assert projection.refresh(conn, echo=lambda *_: None) == 18 and not projection.is_stale(conn)
+
+
+@needs_db
 def test_dry_run_fit_writes_nothing(conn):
     from src.cluster import run
     X, truth, _ = blobs(3, 5, seed=6)
