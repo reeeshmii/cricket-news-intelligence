@@ -1,14 +1,14 @@
 /* ---------------------------------------------------------------- tokens
-   Palette (exact): sage #8FB08A · pale sage #C9D8C4 · warm cream #FFF7EA ·
-   sand beige #E6D9C7 · deep forest green #556B5A.
-   Tints are washes of those colours: pale sage 45% (forest text on it: 4.7-4.9:1) and sand 50%
-   (4.9:1). All text is forest (5.4:1 on cream, 5.8:1 on white). Sage is only used for marks. */
+   Palette (exact): sage #6E9667 · pale sage #869B7F · cream (tan) #BCA581 ·
+   sand beige #E6D9C7 · deep forest green #2E4634.
+   Measured contrast: forest text on white 10.3:1, on the tints 5.4-8.8:1, on the tan page 4.3:1
+   (just under the 4.5:1 guideline for small text such as the menu and subtitles); white on forest 10.3:1. Sage marks 3.4:1, pale sage 3.0:1. */
 :root {
-  --sage: #8fb08a;
-  --pale-sage: #c9d8c4;
-  --cream: #fff7ea;
+  --sage: #6e9667;
+  --pale-sage: #869b7f;
+  --cream: #bca581;
   --sand: #e6d9c7;
-  --forest: #556b5a;
+  --forest: #2e4634;
   --white: #ffffff;
   --pale-tint: rgba(201, 216, 196, 0.45);
   --sand-tint: rgba(230, 217, 199, 0.5);
@@ -16,7 +16,7 @@
   --radius: 16px;
   --radius-sm: 10px;
   --border: 1px solid var(--sand);
-  --shadow: 0 1px 2px rgba(85, 107, 90, 0.04), 0 6px 18px rgba(85, 107, 90, 0.05);
+  --shadow: 0 1px 2px rgba(46, 70, 52, 0.06), 0 6px 18px rgba(46, 70, 52, 0.08);
   --gap: 20px;
 
   --sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -107,7 +107,7 @@ button, input, select { font: inherit; color: inherit; }
 .field { display: grid; gap: 5px; font-size: 12px; font-weight: 600; }
 .input, .select { height: 40px; padding: 0 14px; border: var(--border); border-radius: var(--radius-sm); background: var(--white); min-width: 0; }
 .select { appearance: none; padding-right: 36px; cursor: pointer;
-  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23556B5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; }
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232E4634' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; }
 .input:hover, .select:hover { border-color: var(--sage); }
 .with-icon { position: relative; display: block; }
 .with-icon > svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); pointer-events: none; }
@@ -190,7 +190,7 @@ table.data td.title a:hover { text-decoration: underline; text-underline-offset:
 .pager { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 .pager button { min-width: 34px; height: 34px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; font-weight: 600; font-size: 13px; padding: 0 6px; }
 .pager button:hover:not(:disabled) { background: var(--sand-tint); }
-.pager button[aria-current="page"] { background: var(--forest); color: var(--cream); }
+.pager button[aria-current="page"] { background: var(--forest); color: var(--white); }
 .pager button:disabled { opacity: 0.35; cursor: default; }
 .pager .gap { padding: 0 2px; }
 .result-count { font-size: 12.5px; text-align: center; margin-top: 8px; }
@@ -216,7 +216,7 @@ table.data td.title a:hover { text-decoration: underline; text-underline-offset:
 .carousel-track::-webkit-scrollbar { display: none; }
 .cluster-card { flex: 0 0 200px; text-align: left; border: var(--border); border-radius: 14px; background: var(--white); padding: 14px; cursor: pointer;
   display: grid; gap: 8px; box-shadow: var(--shadow); }
-.cluster-card:hover { background: var(--cream); }
+.cluster-card:hover { background: var(--sand-tint); }
 .cluster-card[aria-pressed="true"] { border: 1.5px solid var(--forest); background: var(--pale-tint); }
 .cluster-card .name { font: 500 15px/1.2 var(--serif); }
 .cluster-card .count { font-size: 12.5px; }

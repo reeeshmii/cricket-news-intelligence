@@ -6,9 +6,13 @@ import { Card, ChartCard, HBars, KpiCard, Notice, SimpleTable, Topbar, TopicChip
 import { fmtDate, fmtDay, fmtNum, fmtUpdated, fmtWeek, sourceName, timeAgo, toWeeks } from "../format.js";
 import { IconArrowRight, IconCalendar, IconDatabase, IconDoc, IconRefresh, IconTopics, IconTrendUp, IconUp } from "../icons.jsx";
 
-const C = { forest: "#556B5A", sage: "#8FB08A", pale: "#C9D8C4", sand: "#E6D9C7", white: "#FFFFFF" };
+const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", cream: "#BCA581", sand: "#E6D9C7", white: "#FFFFFF" };
 // Colour follows the source, never its rank, so a period change never repaints a source.
-const SOURCE_COLOR = { wisden: C.forest, hindustantimes: C.sage, crictracker: C.pale, cricketaddictor: C.sand };
+// Slices are drawn in this fixed order so neighbours always differ enough (sage and pale sage
+// are too alike to sit side by side, so the donut uses tan cream instead of pale sage).
+const SOURCE_ORDER = ["hindustantimes", "wisden", "crictracker", "cricketaddictor"];
+const SOURCE_COLOR = { hindustantimes: C.sage, wisden: C.forest, crictracker: C.cream, cricketaddictor: C.sand };
+const byFixedOrder = (rows) => [...rows].sort((a, b) => SOURCE_ORDER.indexOf(a.source) - SOURCE_ORDER.indexOf(b.source));
 const PERIODS = [
   { value: "1", label: "Last 24 hours" },
   { value: "7", label: "Last 7 days" },
@@ -35,9 +39,9 @@ function SourceDonut({ rows, total, loading }) {
           <div role="img" aria-label="Donut chart of articles by source; values listed beside it" style={{ width: 150, height: 150 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={rows} dataKey="articles" nameKey="source" innerRadius={46} outerRadius={72} startAngle={90} endAngle={-270}
+                <Pie data={byFixedOrder(rows)} dataKey="articles" nameKey="source" innerRadius={46} outerRadius={72} startAngle={90} endAngle={-270}
                      stroke={C.white} strokeWidth={2} isAnimationActive={false}>
-                  {rows.map((r) => <Cell key={r.source} fill={SOURCE_COLOR[r.source] ?? C.sand} />)}
+                  {byFixedOrder(rows).map((r) => <Cell key={r.source} fill={SOURCE_COLOR[r.source] ?? C.sand} />)}
                 </Pie>
                 <Tooltip isAnimationActive={false} content={({ active, payload }) => active && payload?.length ? (
                   <div className="tooltip"><div className="t-row"><span className="k strong" />

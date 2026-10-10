@@ -5,7 +5,7 @@ import { Card, ChartCard, HBars, Notice, SimpleTable, Topbar } from "../componen
 import { addDays, fmtDay, fmtNum, fmtWeek, sourceName, toWeeks } from "../format.js";
 import { IconCalendar } from "../icons.jsx";
 
-const C = { forest: "#556B5A", sage: "#8FB08A", pale: "#C9D8C4", sand: "#E6D9C7", white: "#FFFFFF" };
+const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", sand: "#E6D9C7", white: "#FFFFFF" };
 const RANGES = [
   { value: "7", label: "Last 7 days" },
   { value: "14", label: "Last 14 days" },
