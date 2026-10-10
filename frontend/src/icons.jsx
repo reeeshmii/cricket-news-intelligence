@@ -64,14 +64,14 @@ export const IconImage = (p) => (
 export function LogoMark({ size = 52 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <circle cx="40" cy="26" r="17" fill="#C9D8C4" />
+      <circle cx="40" cy="26" r="17" fill="#869B7F" />
       <g transform="rotate(-40 32 32)">
-        <rect x="27.5" y="6" width="9" height="34" rx="4" fill="#556B5A" />
-        <rect x="30.5" y="38" width="3" height="18" rx="1.5" fill="#556B5A" />
-        <path d="M30 13.5h4M30 18.5h4" stroke="#C9D8C4" strokeWidth="1.4" strokeLinecap="round" />
+        <rect x="27.5" y="6" width="9" height="34" rx="4" fill="#2E4634" />
+        <rect x="30.5" y="38" width="3" height="18" rx="1.5" fill="#2E4634" />
+        <path d="M30 13.5h4M30 18.5h4" stroke="#869B7F" strokeWidth="1.4" strokeLinecap="round" />
       </g>
-      <circle cx="16" cy="47" r="5.5" fill="#8FB08A" />
-      <path d="M12.6 44.2c2.2 1.5 4.6 4.1 5.7 6.9" stroke="#FFF7EA" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <circle cx="16" cy="47" r="5.5" fill="#6E9667" />
+      <path d="M12.6 44.2c2.2 1.5 4.6 4.1 5.7 6.9" stroke="#BCA581" strokeWidth="1.2" fill="none" strokeLinecap="round" />
     </svg>
   );
 }
@@ -82,42 +82,42 @@ export function StadiumScene() {
     <svg className="stadium" viewBox="0 0 260 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FFF7EA" stopOpacity="0" />
-          <stop offset="0.45" stopColor="#C9D8C4" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#C9D8C4" />
+          <stop offset="0" stopColor="#BCA581" stopOpacity="0" />
+          <stop offset="0.45" stopColor="#869B7F" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#869B7F" />
         </linearGradient>
       </defs>
       <rect width="260" height="300" fill="url(#sky)" />
       {/* birds */}
-      <path d="M58 64q5-4 9 0q4-4 9 0M178 44q4-3 7 0q3-3 7 0" stroke="#8FB08A" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+      <path d="M58 64q5-4 9 0q4-4 9 0M178 44q4-3 7 0q3-3 7 0" stroke="#6E9667" strokeWidth="1.4" fill="none" strokeLinecap="round" />
       {/* distant hills */}
-      <path d="M0 150 C40 128 80 132 120 144 S200 126 260 140 V300 H0Z" fill="#C9D8C4" />
+      <path d="M0 150 C40 128 80 132 120 144 S200 126 260 140 V300 H0Z" fill="#869B7F" />
       {/* floodlights */}
       {[[44, 96], [212, 90]].map(([x, top]) => (
         <g key={x}>
-          <rect x={x - 12} y={top} width="24" height="14" rx="2" fill="#E6D9C7" stroke="#8FB08A" strokeWidth="1.2" />
-          <path d={`M${x - 8} ${top + 5}h16M${x - 8} ${top + 9}h16`} stroke="#8FB08A" strokeWidth="1" />
-          <path d={`M${x} ${top + 14}V188`} stroke="#8FB08A" strokeWidth="2.2" />
+          <rect x={x - 12} y={top} width="24" height="14" rx="2" fill="#E6D9C7" stroke="#6E9667" strokeWidth="1.2" />
+          <path d={`M${x - 8} ${top + 5}h16M${x - 8} ${top + 9}h16`} stroke="#6E9667" strokeWidth="1" />
+          <path d={`M${x} ${top + 14}V188`} stroke="#6E9667" strokeWidth="2.2" />
         </g>
       ))}
       {/* stands */}
-      <path d="M0 178 C70 160 190 160 260 178 V208 H0Z" fill="#8FB08A" opacity="0.55" />
-      <path d="M0 186 C70 170 190 170 260 186" stroke="#FFF7EA" strokeWidth="1.2" fill="none" opacity="0.8" />
-      <path d="M0 195 C70 180 190 180 260 195" stroke="#FFF7EA" strokeWidth="1.2" fill="none" opacity="0.8" />
+      <path d="M0 178 C70 160 190 160 260 178 V208 H0Z" fill="#6E9667" opacity="0.55" />
+      <path d="M0 186 C70 170 190 170 260 186" stroke="#BCA581" strokeWidth="1.2" fill="none" opacity="0.8" />
+      <path d="M0 195 C70 180 190 180 260 195" stroke="#BCA581" strokeWidth="1.2" fill="none" opacity="0.8" />
       {/* outfield */}
-      <ellipse cx="130" cy="262" rx="190" ry="72" fill="#8FB08A" />
-      <ellipse cx="130" cy="262" rx="150" ry="52" fill="#C9D8C4" opacity="0.55" />
+      <ellipse cx="130" cy="262" rx="190" ry="72" fill="#6E9667" />
+      <ellipse cx="130" cy="262" rx="150" ry="52" fill="#869B7F" opacity="0.55" />
       {/* pitch */}
       <path d="M118 232 h24 l8 52 h-40z" fill="#E6D9C7" />
       {/* batter */}
-      <g fill="#556B5A">
+      <g fill="#2E4634">
         <circle cx="128" cy="236" r="3.2" />
         <rect x="125.6" y="239.5" width="5" height="11" rx="2" />
-        <path d="M131 243 l7 -6" stroke="#556B5A" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M131 243 l7 -6" stroke="#2E4634" strokeWidth="1.8" strokeLinecap="round" />
       </g>
       {/* trees */}
       {[[14, 214, 16], [38, 222, 12], [228, 216, 15], [250, 226, 12]].map(([x, y, r]) => (
-        <g key={x}><rect x={x - 1.5} y={y} width="3" height={r} fill="#556B5A" opacity="0.7" /><circle cx={x} cy={y} r={r} fill="#556B5A" opacity="0.55" /></g>
+        <g key={x}><rect x={x - 1.5} y={y} width="3" height={r} fill="#2E4634" opacity="0.7" /><circle cx={x} cy={y} r={r} fill="#2E4634" opacity="0.55" /></g>
       ))}
     </svg>
   );

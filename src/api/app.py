@@ -5,6 +5,7 @@
 On Vercel, api/index.py exposes this same app as a serverless function (see vercel.json).
 
 Endpoints (all JSON, all read-only):
+  /api/health      configuration check (no secrets)
   /api/status      cheap "has anything changed?" version + last refresh times (polled by the UI)
   /api/meta        filter options: sources, topics, date bounds
   /api/overview    KPIs, distributions by source and topic, recently collected articles
@@ -20,9 +21,12 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+import psycopg
+
+from .. import config
 from . import db, queries
 
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "dist"
@@ -37,6 +41,41 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="T20 Cricket News Intelligence API", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["GET"], allow_headers=["*"])
+
+
+def describe_error(exc: Exception) -> str:
+    """A safe, useful message for the dashboard and logs. Never includes the connection string."""
+    first = str(exc).splitlines()[0] if str(exc) else ""
+    if isinstance(exc, RuntimeError) and "DATABASE_URL" in first:
+        return "DATABASE_URL is not set on the server (add it in the hosting settings, then redeploy)"
+    if isinstance(exc, psycopg.ProgrammingError) and "connection" in first.lower():
+        return ("DATABASE_URL is not a valid connection string: it must start with postgresql:// "
+                "(no 'psql' command and no quotes around it)")
+    if isinstance(exc, psycopg.OperationalError):
+        return "Could not connect to the database (check DATABASE_URL and that the Neon project is active)"
+    return f"Server error ({type(exc).__name__})"
+
+
+@app.exception_handler(Exception)
+async def unhandled_error(request, exc: Exception):
+    print(f"error on {request.url.path}: {type(exc).__name__}: {describe_error(exc)}")   # visible in host logs
+    return JSONResponse(status_code=500, content={"detail": describe_error(exc)})
+
+
+@app.get("/api/health")
+def health():
+    """Configuration check without secrets: booleans only, plus whether a query succeeds."""
+    url = config.DATABASE_URL or ""
+    info = {"serverless": db.SERVERLESS, "database_url_set": bool(url),
+            "starts_with_postgresql": url.startswith(("postgresql://", "postgres://")),
+            "pooled_host": "-pooler." in url}
+    try:
+        with db.connection() as conn:
+            conn.execute("SELECT 1")
+        info["database"] = "ok"
+    except Exception as exc:
+        info["database"] = describe_error(exc)
+    return info
 
 
 @app.get("/api/status")

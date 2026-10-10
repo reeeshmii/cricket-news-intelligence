@@ -47,18 +47,22 @@ export const useStatus = () => useContext(StatusContext);
 // ------------------------------------------------------------------ data hook
 // Keeps the previous data while refetching (the UI fades it instead of flashing a skeleton).
 export function useApi(path, params = {}, { enabled = true } = {}) {
-  const { version, tick } = useStatus();
+  const { version, tick, error: statusError } = useStatus();
   const key = JSON.stringify([path, params]);
   const [state, setState] = useState({ data: null, error: null, loading: enabled });
   const seq = useRef(0);
   useEffect(() => {
-    if (!enabled || version === null) return;
+    if (!enabled) return;
+    if (version === null) {                       // API unreachable or failing: show why, don't wait forever
+      if (statusError) setState((s) => ({ ...s, error: statusError, loading: false }));
+      return;
+    }
     const mine = ++seq.current;
     setState((s) => ({ ...s, loading: true }));
     getJSON(path, params)
       .then((data) => mine === seq.current && setState({ data, error: null, loading: false }))
       .catch((error) => mine === seq.current && setState((s) => ({ ...s, error, loading: false })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, version, tick, enabled]);
+  }, [key, version, tick, enabled, statusError]);
   return state;
 }

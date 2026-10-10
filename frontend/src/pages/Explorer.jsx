@@ -6,7 +6,7 @@ import { Card, ChartCard, Notice, Pager, Topbar } from "../components.jsx";
 import { fmtDate, fmtNum, sourceName } from "../format.js";
 import { IconChevronLeft, IconChevronRight, IconInfo } from "../icons.jsx";
 
-const C = { forest: "#556B5A", sage: "#8FB08A", pale: "#C9D8C4", sand: "#E6D9C7", white: "#FFFFFF" };
+const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", sand: "#E6D9C7", white: "#FFFFFF" };
 const PROJECTION_HELP =
   "Each dot is an article placed by a 2-D projection of its 384-d sentence embedding: similar articles sit close together. " +
   "Topics were found in the full embedding space (HDBSCAN); the projection is only for viewing them.";

@@ -131,7 +131,7 @@ export function Pager({ page, pageSize, total, onPage }) {
 export function Notice({ error, children }) {
   return (
     <div className={`notice ${error ? "error" : ""}`} role={error ? "alert" : "status"}>
-      {error ? `Could not load data (${error.message}). Is the API running?` : children}
+      {error ? `Could not load data. ${error.message.replace(/^\d+: /, "")}` : children}
     </div>
   );
 }

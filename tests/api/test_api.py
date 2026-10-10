@@ -84,6 +84,30 @@ def test_serverless_mode_uses_one_connection_per_request(client, monkeypatch):
     assert client.get("/api/topics/map?method=pca").json()["method"] == "pca"
 
 
+def test_health_reports_configuration_without_secrets(client):
+    h = client.get("/api/health").json()
+    assert h["database"] == "ok" and h["database_url_set"] and h["starts_with_postgresql"]
+    assert all(isinstance(v, bool) for k, v in h.items() if k != "database")      # no secrets, just yes/no
+
+
+def test_bad_database_url_gives_a_clear_error_not_a_bare_500(client, monkeypatch):
+    from fastapi.testclient import TestClient
+    from src import config
+    from src.api import db as api_db
+    client = TestClient(client.app, raise_server_exceptions=False)               # respond like a real server
+    monkeypatch.setattr(api_db, "SERVERLESS", True)                              # no pool: read the URL per request
+    real = config.DATABASE_URL
+    monkeypatch.setattr(config, "DATABASE_URL", "")
+    r = client.get("/api/status")
+    assert r.status_code == 500 and "DATABASE_URL is not set" in r.json()["detail"]
+    monkeypatch.setattr(config, "DATABASE_URL", f"psql '{real}'")                 # Neon's copy-as-command format
+    r = client.get("/api/status")
+    assert "must start with postgresql://" in r.json()["detail"]
+    credentials = real.split("@")[0]                                                # user:password part
+    for text in (r.text, client.get("/api/health").text):                          # the URL is never echoed
+        assert real not in text and credentials not in text
+
+
 def test_vercel_entry_point_exposes_the_app():
     import importlib.util
     from pathlib import Path
