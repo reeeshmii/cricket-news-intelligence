@@ -24,12 +24,9 @@ export function timeAgo(v, now = new Date()) {
 }
 
 export const SOURCE_NAMES = {
-  bbc: "BBC Sport",
-  guardian: "The Guardian",
   wisden: "Wisden",
-  crictracker: "CricTracker",
   hindustantimes: "Hindustan Times",
-  indianexpress: "Indian Express",
+  crictracker: "CricTracker",
   cricketaddictor: "Cricket Addictor",
 };
 export const sourceName = (s) => SOURCE_NAMES[s] ?? s;

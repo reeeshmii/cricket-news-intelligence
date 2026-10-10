@@ -8,7 +8,7 @@ Nothing is a static dataset. Every 3 hours new articles flow through the pipelin
 updated, and the dashboard refreshes by itself.
 
 ```
-Wisden · BBC Sport · The Guardian · CricTracker · Hindustan Times · Indian Express · Cricket Addictor
+Wisden · Hindustan Times · CricTracker · Cricket Addictor
         │  sitemap / RSS discovery, robots.txt respected, 2 s per-site delay
         ▼
   CRAWLER      extract → validate (T20 filter) → 3-layer duplicate check ─────┐
