@@ -24,12 +24,9 @@ export function timeAgo(v, now = new Date()) {
 }
 
 export const SOURCE_NAMES = {
-  bbc: "BBC Sport",
-  guardian: "The Guardian",
   wisden: "Wisden",
-  crictracker: "CricTracker",
   hindustantimes: "Hindustan Times",
-  indianexpress: "Indian Express",
+  crictracker: "CricTracker",
   cricketaddictor: "Cricket Addictor",
 };
 export const sourceName = (s) => SOURCE_NAMES[s] ?? s;
@@ -41,3 +38,21 @@ export const addDays = (iso, n) => {
   d.setUTCDate(d.getUTCDate() + n);
   return isoDay(d);
 };
+
+const fullFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+export const fmtUpdated = (v) => (v ? fullFmt.format(toDate(v)).replace(",", " ·") : "—");
+
+/** Sum daily values into weeks starting on Monday: [{day, value}] -> [{day (week start), value}] */
+export function toWeeks(rows, key) {
+  const out = new Map();
+  for (const r of rows) {
+    const d = new Date(`${r.day}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    const wk = isoDay(d);
+    const prev = out.get(wk) ?? { day: wk };
+    for (const k of key) prev[k] = (prev[k] ?? 0) + (r[k] ?? 0);
+    out.set(wk, prev);
+  }
+  return [...out.values()];
+}
+export const fmtWeek = (iso) => `w/c ${fmtDay(iso)}`;

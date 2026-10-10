@@ -95,6 +95,7 @@ def crawl_source(source, fetcher, store, limit: int, days: int, dry_run: bool = 
             "title": doc["title"], "author": doc["author"], "published_at": doc["published_at"],
             "body": doc["body"], "word_count": len(doc["body"].split()),
             "content_hash": chash, "simhash": sh, "scraped_at": _now().isoformat(),
+            "image_url": doc.get("image_url"),
         }
         stats["new"] += 1
         echo(f"  + {article['title'][:90]}  ({article['word_count']} words)")

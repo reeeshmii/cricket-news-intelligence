@@ -16,16 +16,19 @@ and plain HTTP returns the full text (no Playwright needed).
 | name | site | discovery |
 |---|---|---|
 | `wisden` | wisden.com | sitemap (`site-map/post/1.xml`, newest first) |
-| `bbc` | BBC Sport | RSS |
-| `guardian` | The Guardian | RSS |
-| `crictracker` | CricTracker | RSS |
 | `hindustantimes` | Hindustan Times | RSS |
-| `indianexpress` | Indian Express | RSS |
+| `crictracker` | CricTracker | RSS |
 | `cricketaddictor` | Cricket Addictor | RSS |
 
-Not used: **Cricbuzz** and **ESPNcricinfo** return 403 from Akamai bot protection, even for
-`robots.txt`. The **Times of India** and **ESPN.com** feeds are stale (2016 / 2020). No
-**Sky Sports** cricket feed was found.
+These four supplied 53 of the first 60 stored T20 articles.
+
+Not used:
+- **BBC Sport**, **The Guardian** and **Indian Express** were reachable but mostly non-T20
+  (5%, 10% and 36% of fetched pages were T20). They were removed on 2026-10-10.
+- **Cricbuzz** and **ESPNcricinfo** return 403 from Akamai bot protection, even for
+  `robots.txt`.
+- The **Times of India** and **ESPN.com** feeds are stale (2016 / 2020).
+- No **Sky Sports** cricket feed was found.
 
 ## Setup
 
@@ -45,7 +48,7 @@ The crawler switches the pooled host (`ep-…-pooler…`) to Neon's direct host 
 | preview, store nothing | `python -m src.crawler.crawl --limit 3 --dry-run` |
 | one crawl, local files | `python -m src.crawler.crawl --limit 10` |
 | one crawl, Neon | `python -m src.crawler.crawl --limit 10 --store neon` |
-| one source only | `python -m src.crawler.crawl --source bbc --limit 10` |
+| one source only | `python -m src.crawler.crawl --source wisden --limit 10` |
 | run continuously | `python -m src.crawler.loop --every 30 --store neon` (Ctrl+C to stop) |
 | quality report | `python -m src.crawler.report --store neon` |
 | tests | `python -m pytest tests -q` |

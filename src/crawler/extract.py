@@ -53,8 +53,18 @@ def extract_article(html: str, url: str) -> dict | None:
                   or _clean_author(_ld_author(ld)) or _clean_author(doc.get("author")),
         "published_at": published,
         "canonical_url": urljoin(url, canonical["href"].strip()) if canonical and canonical.get("href") else url,
+        "image_url": image_url(soup, url),
         "body": doc["text"].strip(),
     }
+
+
+def image_url(soup: BeautifulSoup, url: str) -> str | None:
+    """The article's own preview image (og:image / twitter:image), as an absolute https URL."""
+    src = _meta(soup, "og:image", "og:image:url", "twitter:image")
+    if not src:
+        return None
+    src = urljoin(url, src.strip())
+    return src if src.startswith("https://") else None
 
 
 def _clean_author(value) -> str | None:

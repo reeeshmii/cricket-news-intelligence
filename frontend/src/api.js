@@ -17,24 +17,29 @@ export async function getJSON(path, params = {}) {
 // ------------------------------------------------------------------ live status
 // Polls the cheap /api/status endpoint. Its `version` changes whenever new articles,
 // assignments or a new topic model arrive; every page refetches when it changes.
-const StatusContext = createContext({ status: null, version: null, error: null, lastChecked: null });
+const StatusContext = createContext({ status: null, version: null, error: null, lastChecked: null, tick: 0, refresh: () => {} });
 const POLL_MS = 60_000;
 
 export function StatusProvider({ children }) {
-  const [state, setState] = useState({ status: null, version: null, error: null, lastChecked: null });
+  const [state, setState] = useState({ status: null, version: null, error: null, lastChecked: null, tick: 0 });
+  const checkRef = useRef(() => {});
   useEffect(() => {
     let alive = true;
-    const check = () =>
+    const check = (force = false) =>
       getJSON("/api/status")
-        .then((s) => alive && setState({ status: s, version: s.version, error: null, lastChecked: new Date() }))
+        .then((s) => alive && setState((p) => ({ status: s, version: s.version, error: null, lastChecked: new Date(),
+                                                  tick: force ? p.tick + 1 : p.tick })))
         .catch((e) => alive && setState((p) => ({ ...p, error: e, lastChecked: new Date() })));
+    checkRef.current = check;
     check();
     const id = setInterval(check, POLL_MS);
     const onFocus = () => check();
     window.addEventListener("focus", onFocus);
     return () => { alive = false; clearInterval(id); window.removeEventListener("focus", onFocus); };
   }, []);
-  return createElement(StatusContext.Provider, { value: state }, children);
+  // refresh(): check for new data now and refetch every visible panel (the header's refresh button)
+  const value = { ...state, refresh: () => checkRef.current(true) };
+  return createElement(StatusContext.Provider, { value }, children);
 }
 
 export const useStatus = () => useContext(StatusContext);
@@ -42,7 +47,7 @@ export const useStatus = () => useContext(StatusContext);
 // ------------------------------------------------------------------ data hook
 // Keeps the previous data while refetching (the UI fades it instead of flashing a skeleton).
 export function useApi(path, params = {}, { enabled = true } = {}) {
-  const { version } = useStatus();
+  const { version, tick } = useStatus();
   const key = JSON.stringify([path, params]);
   const [state, setState] = useState({ data: null, error: null, loading: enabled });
   const seq = useRef(0);
@@ -54,6 +59,6 @@ export function useApi(path, params = {}, { enabled = true } = {}) {
       .then((data) => mine === seq.current && setState({ data, error: null, loading: false }))
       .catch((error) => mine === seq.current && setState((s) => ({ ...s, error, loading: false })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, version, enabled]);
+  }, [key, version, tick, enabled]);
   return state;
 }
