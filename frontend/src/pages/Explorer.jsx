@@ -6,7 +6,7 @@ import { Card, ChartCard, Notice, Pager, Topbar } from "../components.jsx";
 import { fmtDate, fmtNum, sourceName } from "../format.js";
 import { IconChevronLeft, IconChevronRight, IconInfo } from "../icons.jsx";
 
-const C = { forest: "#2E4634", sage: "#6E9667", pale: "#869B7F", sand: "#E6D9C7", white: "#FFFFFF" };
+const C = { forest: "#2E4634", sand: "#E6D9C7", white: "#FFFFFF", g1: "#4B6043", g2: "#658354", g3: "#75975E", g4: "#87AB69" };
 const PROJECTION_HELP =
   "Each dot is an article placed by a 2-D projection of its 384-d sentence embedding: similar articles sit close together. " +
   "Topics were found in the full embedding space (HDBSCAN); the projection is only for viewing them.";
@@ -22,8 +22,8 @@ function MapDot({ cx, cy, payload, selected }) {
     <g style={{ cursor: inTopic ? "pointer" : "default" }}>
       <circle cx={cx} cy={cy} r={12} fill="transparent" />
       {inTopic
-        ? <circle cx={cx} cy={cy} r={isSel ? 6.5 : 5} fill={isSel ? C.forest : C.sage} stroke={C.white} strokeWidth={2} />
-        : <circle cx={cx} cy={cy} r={4.5} fill={C.white} stroke={C.sage} strokeWidth={1.5} />}
+        ? <circle cx={cx} cy={cy} r={isSel ? 6.5 : 5} fill={isSel ? C.g1 : C.g4} stroke={C.white} strokeWidth={2} />
+        : <circle cx={cx} cy={cy} r={4.5} fill={C.white} stroke={C.g3} strokeWidth={1.5} />}
     </g>
   );
 }

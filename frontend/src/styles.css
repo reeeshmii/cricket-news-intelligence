@@ -1,15 +1,21 @@
 /* ---------------------------------------------------------------- tokens
-   Palette (exact): sage #6E9667 · pale sage #869B7F · cream (tan) #BCA581 ·
+   Palette (exact): sage #6E9667 · pale sage #869B7F · cream #FFF7EA ·
    sand beige #E6D9C7 · deep forest green #2E4634.
-   Measured contrast: forest text on white 10.3:1, on the tints 5.4-8.8:1, on the tan page 4.3:1
-   (just under the 4.5:1 guideline for small text such as the menu and subtitles); white on forest 10.3:1. Sage marks 3.4:1, pale sage 3.0:1. */
+   Measured contrast: forest text on cream 9.7:1, on white 10.3:1, on the tints 5.4-8.8:1.
+   Chart greens (--chart-1..4) pass as an ordered scale; as separate identities neighbours are
+   too close, so charts use them by emphasis/rank and always print values. */
 :root {
   --sage: #6e9667;
   --pale-sage: #869b7f;
-  --cream: #bca581;
+  --cream: #fff7ea;
   --sand: #e6d9c7;
   --forest: #2e4634;
   --white: #ffffff;
+  /* chart greens: one hue, four lightness steps (an ordered scale, darkest = most emphasis) */
+  --chart-1: #4b6043;
+  --chart-2: #658354;
+  --chart-3: #75975e;
+  --chart-4: #87ab69;
   --pale-tint: rgba(201, 216, 196, 0.45);
   --sand-tint: rgba(230, 217, 199, 0.5);
 
@@ -153,8 +159,8 @@ a.chip:hover, button.chip:hover { text-decoration: underline; text-underline-off
 .hbar.clickable:hover .hbar-label { text-decoration: underline; text-underline-offset: 3px; }
 .hbar-label { text-align: right; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .hbar-track { height: 13px; }
-.hbar-fill { height: 100%; border-radius: 0 4px 4px 0; background: var(--sage); min-width: 3px; transition: width 0.3s; }
-.hbar-fill.forest { background: var(--forest); }
+.hbar-fill { height: 100%; border-radius: 0 4px 4px 0; background: var(--chart-2); min-width: 3px; transition: width 0.3s; }
+.hbar-fill.forest { background: var(--chart-1); }
 .hbar-fill.sand { background: var(--sand); }
 .hbar-value { font-variant-numeric: tabular-nums; font-weight: 600; }
 .hbars.left-labels .hbar-label { text-align: left; }
@@ -199,11 +205,11 @@ table.data td.title a:hover { text-decoration: underline; text-underline-offset:
 .map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 10px; align-items: center; }
 .map-legend { display: grid; gap: 9px; font-size: 12.5px; }
 .legend-key { display: inline-flex; align-items: center; gap: 8px; }
-.legend-key .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sage); flex: none; }
-.legend-key .dot.strong { background: var(--forest); }
-.legend-key .dot.hollow { background: var(--white); border: 1.5px solid var(--sage); }
-.legend-key .line { width: 18px; height: 2.5px; border-radius: 2px; background: var(--pale-sage); flex: none; }
-.legend-key .line.strong { background: var(--forest); }
+.legend-key .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chart-4); flex: none; }
+.legend-key .dot.strong { background: var(--chart-1); }
+.legend-key .dot.hollow { background: var(--white); border: 1.5px solid var(--chart-3); }
+.legend-key .line { width: 18px; height: 2.5px; border-radius: 2px; background: var(--chart-4); flex: none; }
+.legend-key .line.strong { background: var(--chart-1); }
 @media (max-width: 640px) { .map-layout { grid-template-columns: minmax(0, 1fr); } .map-legend { grid-auto-flow: column; justify-content: start; gap: 14px; } }
 .detail-block { margin-top: 16px; }
 .detail-label { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
@@ -234,8 +240,8 @@ table.data td.title a:hover { text-decoration: underline; text-underline-offset:
 .tooltip .t-title { font-weight: 600; margin-bottom: 4px; }
 .tooltip .t-title.serif { font: 500 14.5px/1.3 var(--serif); }
 .tooltip .t-row { display: grid; grid-template-columns: 14px auto 1fr; align-items: center; gap: 8px; }
-.tooltip .t-row .k { width: 12px; height: 2px; background: var(--pale-sage); }
-.tooltip .t-row .k.strong { background: var(--forest); }
+.tooltip .t-row .k { width: 12px; height: 2px; background: var(--chart-4); }
+.tooltip .t-row .k.strong { background: var(--chart-1); }
 .tooltip .t-row strong { font-variant-numeric: tabular-nums; }
 .tooltip .t-row span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recharts-cartesian-axis-tick-value { fill: var(--forest); font-size: 11.5px; }

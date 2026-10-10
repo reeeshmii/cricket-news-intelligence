@@ -71,7 +71,7 @@ export function LogoMark({ size = 52 }) {
         <path d="M30 13.5h4M30 18.5h4" stroke="#869B7F" strokeWidth="1.4" strokeLinecap="round" />
       </g>
       <circle cx="16" cy="47" r="5.5" fill="#6E9667" />
-      <path d="M12.6 44.2c2.2 1.5 4.6 4.1 5.7 6.9" stroke="#BCA581" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <path d="M12.6 44.2c2.2 1.5 4.6 4.1 5.7 6.9" stroke="#FFF7EA" strokeWidth="1.2" fill="none" strokeLinecap="round" />
     </svg>
   );
 }
@@ -82,7 +82,7 @@ export function StadiumScene() {
     <svg className="stadium" viewBox="0 0 260 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#BCA581" stopOpacity="0" />
+          <stop offset="0" stopColor="#FFF7EA" stopOpacity="0" />
           <stop offset="0.45" stopColor="#869B7F" stopOpacity="0.55" />
           <stop offset="1" stopColor="#869B7F" />
         </linearGradient>
@@ -102,8 +102,8 @@ export function StadiumScene() {
       ))}
       {/* stands */}
       <path d="M0 178 C70 160 190 160 260 178 V208 H0Z" fill="#6E9667" opacity="0.55" />
-      <path d="M0 186 C70 170 190 170 260 186" stroke="#BCA581" strokeWidth="1.2" fill="none" opacity="0.8" />
-      <path d="M0 195 C70 180 190 180 260 195" stroke="#BCA581" strokeWidth="1.2" fill="none" opacity="0.8" />
+      <path d="M0 186 C70 170 190 170 260 186" stroke="#FFF7EA" strokeWidth="1.2" fill="none" opacity="0.8" />
+      <path d="M0 195 C70 180 190 180 260 195" stroke="#FFF7EA" strokeWidth="1.2" fill="none" opacity="0.8" />
       {/* outfield */}
       <ellipse cx="130" cy="262" rx="190" ry="72" fill="#6E9667" />
       <ellipse cx="130" cy="262" rx="150" ry="52" fill="#869B7F" opacity="0.55" />
