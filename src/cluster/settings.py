@@ -13,6 +13,7 @@ TOP_TERMS = 10                             # c-TF-IDF terms kept per topic (and 
 UMAP = os.environ.get("CLUSTER_UMAP", "auto")
 UMAP_MIN_ARTICLES = 300
 KMEANS_MAX_K = 30                          # baseline searches k = 2 .. min(KMEANS_MAX_K, n / 3)
+MAX_TOPIC_SHARE = 0.5                      # a "topic" holding more than half the articles is a collapse
 
 # New articles join the nearest topic if they are at least as close to its centroid as the
 # ASSIGN_PERCENTILE-th percentile of that model's members (never below ASSIGN_FLOOR).
