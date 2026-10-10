@@ -44,6 +44,17 @@ def test_extract_real_wisden_page():
     assert validate(doc, doc["canonical_url"]) is None
 
 
+def test_preview_image_is_extracted_and_must_be_https():
+    from bs4 import BeautifulSoup
+    from src.crawler.extract import image_url
+    doc = extract_article(FIXTURE, URL)
+    assert doc["image_url"] == "https://www.wisden.com/static-assets/waf-images/18/4a/8e/16-9/Ttm7METk4n.jpg"
+    rel = BeautifulSoup('<meta property="og:image" content="/img/a.jpg">', "lxml")
+    assert image_url(rel, "https://site.test/news/1") == "https://site.test/img/a.jpg"
+    insecure = BeautifulSoup('<meta property="og:image" content="http://site.test/a.jpg">', "lxml")
+    assert image_url(insecure, "https://site.test/news/1") is None      # mixed content would not load
+
+
 def test_parse_date_handles_z_and_garbage():
     assert parse_date("2026-01-02T03:04:05Z") == "2026-01-02T03:04:05+00:00"
     assert parse_date("not a date") is None and parse_date(None) is None

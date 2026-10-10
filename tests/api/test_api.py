@@ -67,6 +67,18 @@ def test_overview_counts_and_distributions(client):
     assert len(o["daily"]) == 8 and sum(d["articles"] for d in o["daily"]) == 20     # 7 days + today, zeros filled
     assert o["daily"][-1]["day"] == str(date.today())
     assert client.get("/api/overview/all").json()["total"] == 20
+    assert o["n_sources"] == 1
+    assert o["in_previous"] is None          # collection started within the period: no fake comparison
+
+
+def test_articles_carry_image_and_summary(client):
+    item = client.get("/api/articles?page_size=5").json()["items"][0]
+    assert "image_url" in item and item["summary"] == "b"                  # test bodies are just "b"
+
+
+def test_map_projection_can_be_chosen(client):
+    assert client.get("/api/topics/map?method=pca").json()["method"] == "pca"
+    assert client.get("/api/topics/map?method=tsne").status_code == 422
 
 
 def test_articles_search_filter_sort_paginate(client):

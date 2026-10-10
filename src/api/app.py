@@ -92,10 +92,10 @@ def topics():
 
 
 @app.get("/api/topics/map")
-def topics_map():
+def topics_map(method: Literal["umap", "pca"] = "umap"):
     with db.connection() as conn:
         model_id, rows = queries.embedding_rows(conn)
-    return embedding_map(model_id, rows)
+    return embedding_map(model_id, rows, method)
 
 
 @app.get("/api/trends")

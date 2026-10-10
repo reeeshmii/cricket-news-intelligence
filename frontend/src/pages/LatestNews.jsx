@@ -1,27 +1,46 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useApi } from "../api.js";
-import { Card, Notice, Pagination, TopicChip, Topbar } from "../components.jsx";
-import { fmtDate, fmtNum, sourceName } from "../format.js";
+import { Card, Notice, Pager, Topbar, TopicChip } from "../components.jsx";
+import { addDays, fmtDate, fmtNum, isoDay, sourceName } from "../format.js";
+import { IconCalendar, IconExternal, IconImage, IconRefresh, IconSearch } from "../icons.jsx";
 
 const SORTS = [
-  { value: "newest", label: "Newest first" },
-  { value: "oldest", label: "Oldest first" },
+  { value: "newest", label: "Newest First" },
+  { value: "oldest", label: "Oldest First" },
   { value: "source", label: "Source" },
   { value: "topic", label: "Topic" },
   { value: "title", label: "Headline A–Z" },
 ];
-const DEFAULTS = { q: "", source: "", topic: "", date_from: "", date_to: "", sort: "newest", page: "1", page_size: "20" };
+const RANGES = [
+  { value: "", label: "Any time" },
+  { value: "1", label: "Last 24 hours" },
+  { value: "7", label: "Last 7 days" },
+  { value: "30", label: "Last 30 days" },
+];
+const PAGE_SIZE = 10;
+const DEFAULTS = { q: "", source: "", topic: "", range: "", sort: "newest", page: "1" };
 
 /** Filters live in the URL, so a filtered view can be bookmarked or shared. */
 function useUrlState() {
   const [params, setParams] = useSearchParams();
   const state = Object.fromEntries(Object.entries(DEFAULTS).map(([k, v]) => [k, params.get(k) ?? v]));
-  const update = (patch, { resetPage = true } = {}) => {
-    const next = { ...state, ...patch, ...(resetPage && !("page" in patch) ? { page: "1" } : {}) };
+  const update = (patch) => {
+    const next = { ...state, ...patch, ...("page" in patch ? {} : { page: "1" }) };
     setParams(Object.fromEntries(Object.entries(next).filter(([k, v]) => v !== "" && v !== DEFAULTS[k])), { replace: true });
   };
   return [state, update];
+}
+
+function Thumb({ src, alt }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="thumb">
+      {src && !failed
+        ? <img src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+        : <IconImage size={26} />}
+    </div>
+  );
 }
 
 export default function LatestNews() {
@@ -35,106 +54,89 @@ export default function LatestNews() {
   }, [query]);
 
   const meta = useApi("/api/meta");
-  const { data, error, loading } = useApi("/api/articles", f);
-  const filtered = ["q", "source", "topic", "date_from", "date_to"].some((k) => f[k]);
-  const topicOptions = meta.data?.topics ?? [];
+  const params = {
+    q: f.q, source: f.source, topic: f.topic, sort: f.sort, page: f.page, page_size: PAGE_SIZE,
+    date_from: f.range ? addDays(isoDay(new Date()), -Number(f.range)) : "",
+  };
+  const { data, error, loading } = useApi("/api/articles", params);
+  const filtered = ["q", "source", "topic", "range"].some((k) => f[k]);
 
   return (
     <>
-      <Topbar title="Latest News" />
+      <Topbar title="Latest News" subtitle="Browse, search and filter cricket news articles" />
 
-      <Card className="toolbar-card">
-      <div className="toolbar" role="search">
-        <label className="field">
-          Search headlines and keywords
-          <input className="input search" type="search" value={query} placeholder="e.g. Iyer, auction, injury"
-                 onChange={(e) => setQuery(e.target.value)} />
-        </label>
-        <label className="field">
-          Source
-          <select className="select" value={f.source} onChange={(e) => update({ source: e.target.value })}>
-            <option value="">All sources</option>
-            {(meta.data?.sources ?? []).map((s) => <option key={s} value={s}>{sourceName(s)}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          Topic
-          <select className="select" value={f.topic} onChange={(e) => update({ topic: e.target.value })} style={{ maxWidth: 260 }}>
-            <option value="">All topics</option>
-            <option value="none">Not in a topic yet</option>
-            {topicOptions.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          Published from
-          <input className="input" type="date" value={f.date_from} max={f.date_to || undefined}
-                 onChange={(e) => update({ date_from: e.target.value })} />
-        </label>
-        <label className="field">
-          to
-          <input className="input" type="date" value={f.date_to} min={f.date_from || undefined}
-                 onChange={(e) => update({ date_to: e.target.value })} />
-        </label>
-        <label className="field">
-          Sort
-          <select className="select" value={f.sort} onChange={(e) => update({ sort: e.target.value })}>
-            {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
-        </label>
-        {filtered && (
-          <button className="btn" type="button" onClick={() => { setQuery(""); update({ q: "", source: "", topic: "", date_from: "", date_to: "" }); }}>
-            Clear filters
+      <Card className="filter-card">
+        <div className="filter-row" role="search">
+          <label className="with-icon grow">
+            <IconSearch size={17} />
+            <span className="visually-hidden">Search by title or keywords</span>
+            <input className="input" type="search" value={query} placeholder="Search by title or keywords…"
+                   onChange={(e) => setQuery(e.target.value)} />
+          </label>
+          <label className="with-icon" style={{ width: 190 }}>
+            <IconCalendar size={17} />
+            <span className="visually-hidden">Published</span>
+            <select className="select" value={f.range} onChange={(e) => update({ range: e.target.value })}>
+              {RANGES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </label>
+          <button className="icon-btn" type="button" aria-label="Reset filters" title="Reset filters" disabled={!filtered && query === ""}
+                  onClick={() => { setQuery(""); update({ q: "", source: "", topic: "", range: "" }); }}>
+            <IconRefresh size={17} />
           </button>
-        )}
-      </div>
+        </div>
+        <div className="filter-row">
+          <label className="field">Source
+            <select className="select" value={f.source} onChange={(e) => update({ source: e.target.value })}>
+              <option value="">All Sources</option>
+              {(meta.data?.sources ?? []).map((s) => <option key={s} value={s}>{sourceName(s)}</option>)}
+            </select>
+          </label>
+          <label className="field">Topic
+            <select className="select" value={f.topic} onChange={(e) => update({ topic: e.target.value })}>
+              <option value="">All Topics</option>
+              <option value="none">Not in a topic yet</option>
+              {(meta.data?.topics ?? []).map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+            </select>
+          </label>
+          <label className="field">Sort by
+            <select className="select" value={f.sort} onChange={(e) => update({ sort: e.target.value })}>
+              {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </label>
+        </div>
       </Card>
 
       {error && !data && <Notice error={error} />}
-      {data && (
-        <Card
-          loading={loading}
-          title="Articles"
-          subtitle={`${fmtNum(data.total)} ${filtered ? "matching" : "collected"} articles`}
-          actions={
-            <label className="field" style={{ gridAutoFlow: "column", alignItems: "center", gap: 8 }}>
-              Per page
-              <select className="select pill-select" value={f.page_size} onChange={(e) => update({ page_size: e.target.value })}>
-                {[10, 20, 50].map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </label>
-          }
-        >
-          <div className="table-wrap">
-            <table className="data">
-              <caption className="visually-hidden">Articles</caption>
-              <thead>
-                <tr>
-                  <th style={{ width: "52%" }}>Headline</th>
-                  <th>Source</th>
-                  <th>Published</th>
-                  <th>Topic</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items.map((a) => (
-                  <tr key={a.id}>
-                    <td className="headline">
-                      <a href={a.url} target="_blank" rel="noopener noreferrer">{a.title}</a>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>{sourceName(a.source)}</td>
-                    <td style={{ whiteSpace: "nowrap" }}>{fmtDate(a.published_at ?? a.scraped_at)}</td>
-                    <td style={{ maxWidth: 260 }}><TopicChip id={a.topic_id} label={a.topic_label} status={a.status} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {!data.items.length && <p className="muted-note">No articles match these filters.</p>}
-          </div>
-          <Pagination page={Number(f.page)} pageSize={Number(f.page_size)} total={data.total}
-                      onPage={(p) => { update({ page: String(p) }, { resetPage: false }); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-        </Card>
-      )}
       {!data && !error && <Notice>Loading articles…</Notice>}
+      {data && (
+        <div className={loading ? "loading-fade" : ""}>
+          {data.items.length === 0 && <Notice>No articles match these filters.</Notice>}
+          <div className="news-list">
+            {data.items.map((a) => (
+              <article key={a.id} className="card news-item">
+                <Thumb src={a.image_url} alt="" />
+                <div style={{ minWidth: 0 }}>
+                  <h3><a href={a.url} target="_blank" rel="noopener noreferrer">{a.title}</a></h3>
+                  {a.summary && <p className="summary">{a.summary}</p>}
+                  <div className="meta">
+                    <span className="src">{sourceName(a.source)}</span>
+                    <TopicChip id={a.topic_id} label={a.topic_label} status={a.status} />
+                    <span>{fmtDate(a.published_at ?? a.scraped_at)}</span>
+                  </div>
+                </div>
+                <a className="icon-btn ext" href={a.url} target="_blank" rel="noopener noreferrer"
+                   aria-label={`Open the original article on ${sourceName(a.source)}`} title="Open original article">
+                  <IconExternal size={17} />
+                </a>
+              </article>
+            ))}
+          </div>
+          <Pager page={Number(f.page)} pageSize={PAGE_SIZE} total={data.total}
+                 onPage={(p) => { update({ page: String(p) }); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+          <p className="result-count">{fmtNum(data.total)} {filtered ? "matching" : ""} articles</p>
+        </div>
+      )}
     </>
   );
 }

@@ -53,3 +53,4 @@ CREATE TABLE IF NOT EXISTS crawl_runs (
     errors      INT DEFAULT 0
 );
 ALTER TABLE crawl_runs ADD COLUMN IF NOT EXISTS details JSONB;   -- full per-reason counts
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_url TEXT;           -- article's own preview image (og:image)

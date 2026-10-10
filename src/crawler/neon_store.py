@@ -133,11 +133,11 @@ class NeonStore:
         with self.conn.transaction():
             self.conn.execute(
                 """INSERT INTO articles(source_id, url, canonical_url, title, author, published_at,
-                                        scraped_at, body, word_count, content_hash, simhash)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING""",
+                                        scraped_at, body, word_count, content_hash, simhash, image_url)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING""",
                 (source_id, article["url"], article["canonical_url"], article["title"], article["author"],
                  _ts(article["published_at"]), _ts(article["scraped_at"]), article["body"],
-                 article["word_count"], article["content_hash"], article["simhash"]))
+                 article["word_count"], article["content_hash"], article["simhash"], article.get("image_url")))
             self._mark_seen_sql(article["canonical_url"], "stored", article["content_hash"])
             evicted = self.conn.execute(
                 "DELETE FROM articles WHERE id IN (SELECT id FROM articles ORDER BY id DESC OFFSET %s)",

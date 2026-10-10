@@ -53,7 +53,8 @@ def meta(conn) -> dict:
 # ------------------------------------------------------------------ articles
 ARTICLE_COLUMNS = f"""
     a.id, a.title, a.url, s.name AS source, a.published_at, a.scraped_at, {DAY} AS day, a.status,
-    t.id AS topic_id, t.label AS topic_label, t.score AS topic_score, n.sentiment, n.keywords
+    t.id AS topic_id, t.label AS topic_label, t.score AS topic_score, n.sentiment, n.keywords,
+    a.image_url, left(regexp_replace(a.body, '[[:space:]]+', ' ', 'g'), 280) AS summary
 """
 ARTICLE_FROM = """
     FROM articles a
@@ -114,8 +115,13 @@ def overview(conn, days: int | None) -> dict:
     since = datetime.now(timezone.utc) - timedelta(days=days) if days else None
     p = {"model": model, "since": since}
     period = "(%(since)s::timestamptz IS NULL OR a.scraped_at >= %(since)s::timestamptz)"
+    p["prev_since"] = since - timedelta(days=days) if since else None
     totals = conn.execute(f"""
-        SELECT count(*) AS total, count(*) FILTER (WHERE {period}) AS in_period
+        SELECT count(*) AS total, count(*) FILTER (WHERE {period}) AS in_period,
+               count(*) FILTER (WHERE a.scraped_at >= %(prev_since)s::timestamptz
+                                  AND a.scraped_at < %(since)s::timestamptz) AS in_previous,
+               min(a.scraped_at) AS first_collected,
+               count(DISTINCT a.source_id) AS n_sources
         FROM articles a WHERE a.duplicate_of IS NULL""", p).fetchone()
     by_source = conn.execute(f"""
         SELECT s.name AS source, count(*) AS articles FROM articles a JOIN sources s ON s.id = a.source_id
@@ -146,6 +152,11 @@ def overview(conn, days: int | None) -> dict:
     m = active_model(conn)
     return {
         "days": days, "total": totals["total"], "in_period": totals["in_period"],
+        # previous period of the same length; None when collection had not started then,
+        # so the dashboard never shows a change against a period with no data
+        "in_previous": totals["in_previous"] if since and totals["first_collected"]
+                       and totals["first_collected"] < since - timedelta(days=days) else None,
+        "n_sources": totals["n_sources"],
         "n_topics": len(topics), "unassigned_in_period": unassigned,
         "by_source": by_source, "topics": topics, "recent": recent, "daily": daily,
         "model": {"id": m["id"], "algorithm": m["algorithm"], "fitted_at": m["created_at"]} if m else None,
