@@ -34,19 +34,47 @@ def _use_umap(n: int) -> bool:
     return settings.UMAP == "on" or (settings.UMAP == "auto" and n >= settings.UMAP_MIN_ARTICLES)
 
 
+def _largest_share(labels: np.ndarray) -> float:
+    assigned = labels[labels >= 0]
+    return float(np.bincount(assigned).max() / len(assigned)) if len(assigned) else 1.0
+
+
 def hdbscan_fit(X: np.ndarray) -> TopicFit:
+    """HDBSCAN with a guard against topic collapse.
+
+    HDBSCAN's min_samples defaults to min_cluster_size; from 3 upwards its "excess of mass"
+    selection can merge sibling topics into one blob (seen live: 58 articles -> topics of
+    43 + 7). So min_samples=1, and a few candidate settings are tried: any result where one
+    topic holds more than MAX_TOPIC_SHARE of the assigned articles is rejected, and the rest
+    are ranked by silhouette x sqrt(coverage). Every candidate's scores are kept in params."""
     n, mcs = len(X), min_cluster_size(len(X))
-    params = {"min_cluster_size": mcs, "metric": "cosine", "umap": None}
+    params = {"metric": "cosine", "umap": None, "min_samples": 1}
+    Z = X
     if _use_umap(n):
         import umap                                       # imported lazily: slow (numba) import
         umap_params = {"n_neighbors": min(15, n - 1), "n_components": 5, "min_dist": 0.0,
                        "metric": "cosine", "random_state": 42}
         Z = umap.UMAP(**umap_params).fit_transform(X)
-        labels = HDBSCAN(min_cluster_size=mcs).fit_predict(Z)
         params.update(umap=umap_params, metric="euclidean (UMAP space)")
-    else:
-        labels = HDBSCAN(min_cluster_size=mcs, metric="cosine").fit_predict(X)
-    return TopicFit("hdbscan", labels, params)
+    metric = "euclidean" if params["umap"] else "cosine"
+
+    candidates = []
+    for method, size in (("eom", mcs), ("leaf", mcs), ("eom", max(2, mcs - 1))):
+        labels = HDBSCAN(min_cluster_size=size, min_samples=1, metric=metric,
+                         cluster_selection_method=method).fit_predict(Z)
+        m = labels >= 0
+        k = len(set(labels[m].tolist()))
+        sil = float(silhouette_score(X[m], labels[m], metric="cosine")) if k >= 2 and m.sum() > k else -1.0
+        share = _largest_share(labels)
+        candidates.append({"method": method, "min_cluster_size": size, "topics": k,
+                           "coverage": round(float(m.mean()), 3), "largest_share": round(share, 3),
+                           "silhouette": round(sil, 4), "score": round(sil * float(np.sqrt(m.mean())), 4),
+                           "valid": k >= 2 and share <= settings.MAX_TOPIC_SHARE, "labels": labels})
+    valid = [c for c in candidates if c["valid"]] or candidates
+    best = max(valid, key=lambda c: c["score"])
+    params.update(min_cluster_size=best["min_cluster_size"], cluster_selection_method=best["method"],
+                  candidates=[{k: v for k, v in c.items() if k != "labels"} for c in candidates])
+    return TopicFit("hdbscan", best["labels"], params)
 
 
 def kmeans_fit(X: np.ndarray, k: int | None = None) -> TopicFit:

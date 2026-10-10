@@ -1,0 +1,7 @@
+# The whole system in one environment. Each stage also has its own, smaller file.
+-r requirements-crawler.txt
+-r requirements-database.txt
+-r requirements-nlp.txt
+-r requirements-cluster.txt
+-r requirements-dashboard.txt
+# then: python -m spacy download en_core_web_md

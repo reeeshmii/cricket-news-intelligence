@@ -78,10 +78,11 @@ def fit(conn, algorithm: str = "hdbscan", dry_run: bool = False, echo=print) -> 
                         "coherence_npmi": round(float(np.mean([lb.npmi(vocab, t) for t in base_terms.values()])), 4),
                         **baseline.params}
 
-    previous = []
-    if (old := active_model(conn)):
-        previous = [(k, _vec(c)) for k, c in conn.execute(
-            "SELECT stable_key, centroid FROM clusters WHERE model_id = %s AND stable_key IS NOT NULL", (old[0],))]
+    # Match against the latest centroid of EVERY topic seen before, not only the previous
+    # model's: a topic survives one bad or missing re-fit and keeps its trend history.
+    previous = [(k, _vec(c)) for k, c in conn.execute(
+        "SELECT DISTINCT ON (stable_key) stable_key, centroid FROM clusters "
+        "WHERE stable_key IS NOT NULL ORDER BY stable_key, model_id DESC")]
     keys = model.match_stable_keys(previous, cents, lambda: uuid.uuid4().hex[:10])
 
     topics = []

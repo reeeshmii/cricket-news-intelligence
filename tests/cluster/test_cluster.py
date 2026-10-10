@@ -49,6 +49,22 @@ def test_hdbscan_leaves_outliers_unassigned():
     assert (labels[-3:] == -1).all() and (labels[:-3] >= 0).all()
 
 
+def test_real_news_embeddings_do_not_collapse():
+    """Regression on REAL data: the embeddings of the 58 live articles of 9 Oct 2026 (vectors
+    only, no text). HDBSCAN's default min_samples merged them into topics of 43 + 7; the
+    guarded fit must keep the separate stories apart."""
+    from pathlib import Path
+    from sklearn.cluster import HDBSCAN
+    X = np.load(Path(__file__).parent / "fixtures" / "live_embeddings_58.npy")
+    old = HDBSCAN(min_cluster_size=model.min_cluster_size(len(X)), metric="cosine").fit_predict(X)
+    assert model._largest_share(old) > 0.8                      # the failure this test guards against
+    fit = model.hdbscan_fit(X)
+    assigned = fit.labels[fit.labels >= 0]
+    assert len(set(assigned.tolist())) >= 5
+    assert model._largest_share(fit.labels) <= settings.MAX_TOPIC_SHARE
+    assert {"method", "topics", "largest_share", "valid"} <= set(fit.params["candidates"][0])
+
+
 def test_kmeans_baseline_picks_k_by_silhouette():
     X, truth, _ = blobs(5, 8, seed=2)
     fit = model.kmeans_fit(X)
