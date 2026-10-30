@@ -63,16 +63,6 @@ flowchart TD
 | Testing | pytest, HTTPX |
 | Deployment | Vercel and Neon, as documented in the project report |
 
-## Project Snapshot
-
-The technical report dated 11 October 2026 records the following snapshot:
-
-- **100** stored articles
-- **4** news sources
-- **17** discovered topics
-- **75** automated tests
-
-These are figures reported in the technical report, not live counters.
 
 ## Topic Discovery
 
