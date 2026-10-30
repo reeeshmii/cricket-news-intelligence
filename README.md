@@ -10,6 +10,7 @@
   <img alt="React + Vite" src="https://img.shields.io/badge/React%20%2B%20Vite-Frontend-61DAFB?logo=react&logoColor=black">
   <img alt="Neon PostgreSQL" src="https://img.shields.io/badge/Neon-PostgreSQL-008CC1?logo=postgresql&logoColor=white">
   <img alt="NLP" src="https://img.shields.io/badge/NLP-spaCy%20%7C%20VADER%20%7C%20YAKE-7A3E9D">
+  <img alt="Embeddings" src="https://img.shields.io/badge/Embeddings-Sentence%20Transformers-6A5ACD">
   <img alt="Clustering" src="https://img.shields.io/badge/ML-HDBSCAN%20%7C%20K--Means-EB5E28">
   <img alt="Deployment" src="https://img.shields.io/badge/Deployment-Vercel-000000?logo=vercel&logoColor=white">
 </p>
