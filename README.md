@@ -1,80 +1,237 @@
-# T20 Cricket News Intelligence System
-
-Web crawling, text analysis and dynamic clustering for T20 cricket news.
-
-The system runs on its own: it collects new T20 articles from open news sites, analyses their
-text, groups them into topics it discovers itself, and shows everything on a live dashboard.
-Nothing is a static dataset. Every 3 hours new articles flow through the pipeline, topics are
-updated, and the dashboard refreshes by itself.
-
+```{=html}
+<p align="center">
 ```
-Wisden · Hindustan Times · CricTracker · Cricket Addictor
-        │  sitemap / RSS discovery, robots.txt respected, 2 s per-site delay
-        ▼
-  CRAWLER      extract → validate (T20 filter) → 3-layer duplicate check ─────┐
-        ▼                                                                      │ rolling cap (3,000):
-  NEON POSTGRES   articles · sources · seen_articles · crawl_runs  ◄───────────┘ oldest deleted, never re-fetched
-        ▼
-  NLP          cricket-aware entities · lemmas · sentiment · keywords · 384-d embeddings
-        ▼
-  CLUSTER      HDBSCAN topics (KMeans baseline) · c-TF-IDF labels · stable topics · trend history
-        ▼
-  API + DASHBOARD   FastAPI → React: Overview · Latest News · Topic Explorer · Trending Topics
+```{=html}
+<h1 align="center">
 ```
-
-## Components
-
-| stage | code | docs | tests |
-|---|---|---|---|
-| Web crawler | `src/crawler/` | [src/crawler/README.md](src/crawler/README.md) | `tests/crawler` |
-| Database | `db/schema.sql`, `src/db.py`, `src/init_db.py` | [db/README.md](db/README.md) | `tests/database` |
-| NLP | `src/nlp/` | [src/nlp/README.md](src/nlp/README.md) | `tests/nlp` |
-| Topics & trends | `src/cluster/` | [src/cluster/README.md](src/cluster/README.md) | `tests/cluster` |
-| Dashboard | `src/api/`, `frontend/` | [frontend/README.md](frontend/README.md) | `tests/api` |
-
-Each stage reads only the rows waiting for it (`articles.status`: `cleaned` → `nlp_done` →
-`vectorized` → `clustered`), so every stage can be re-run safely and can run on its own schedule.
-
-## Setup
-
-```bash
-python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements-all.txt
-.venv/Scripts/python -m spacy download en_core_web_md
-copy .env.example .env          # paste your Neon connection string as DATABASE_URL
-.venv/Scripts/python -m src.init_db
-cd frontend && npm install && npm run build && cd ..
+`<b>`{=html}T20 Cricket News Intelligence System`</b>`{=html}
+```{=html}
+</h1>
+```
+```{=html}
+</p>
+```
+```{=html}
+<p align="center">
+```
+An end-to-end NLP system that collects T20 cricket news, discovers
+related topics, and visualises news trends through an interactive
+dashboard.
+```{=html}
+</p>
+```
+```{=html}
+<p align="center">
+```
+`<img alt="Python" src="https://img.shields.io/badge/Python-NLP%20%26%20Backend-3776AB?logo=python&logoColor=white">`{=html}
+`<img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white">`{=html}
+`<img alt="React + Vite" src="https://img.shields.io/badge/React%20%2B%20Vite-Frontend-61DAFB?logo=react&logoColor=black">`{=html}
+`<img alt="PostgreSQL" src="https://img.shields.io/badge/Neon-PostgreSQL-008CC1?logo=postgresql&logoColor=white">`{=html}
+`<img alt="NLP" src="https://img.shields.io/badge/NLP-spaCy%20%7C%20VADER%20%7C%20YAKE-7A3E9D">`{=html}
+`<img alt="Clustering" src="https://img.shields.io/badge/ML-HDBSCAN%20%7C%20K--Means-EB5E28">`{=html}
+`<img alt="Deployment" src="https://img.shields.io/badge/Deployment-Vercel-000000?logo=vercel&logoColor=white">`{=html}
+```{=html}
+</p>
 ```
 
-## Run
+------------------------------------------------------------------------
 
-| what | command |
-|---|---|
-| whole pipeline once | `.venv/Scripts/python run_pipeline.py` |
-| dashboard | `.venv/Scripts/python -m src.api` → http://localhost:8000 |
-| dashboard online | Vercel: see [frontend/README.md](frontend/README.md#deploy-on-vercel) |
-| crawl continuously | `.venv/Scripts/python -m src.crawler.loop --every 30 --store neon` |
-| NLP continuously | `.venv/Scripts/python -m src.nlp.run --every 15` |
-| topics continuously | `.venv/Scripts/python -m src.cluster.run --every 30` |
-| all tests | `.venv/Scripts/python -m pytest tests -q` |
+## About the Project
 
-**Automatically on GitHub** (from `main`, with the `DATABASE_URL` repository secret):
-`crawler.yml` runs every 3 h, which triggers `nlp.yml`, which triggers `cluster.yml`.
+The **T20 Cricket News Intelligence System** collects cricket news from
+accessible sources and analyses articles to identify related topics and
+changing news trends. It combines web crawling, natural language
+processing, semantic embeddings, and topic clustering in a pipeline
+supported by a web dashboard.
 
-## Design decisions
+## Key Features
 
-- **Sources.** Cricbuzz and ESPNcricinfo block automated access (HTTP 403 from Akamai, even for
-  `robots.txt`), so the system uses open sources only. No bot protection is bypassed.
-- **Duplicates.** Three layers: canonical URL, a hash of the exact content, and SimHash for
-  near-duplicates. Re-running any stage never creates duplicate rows.
-- **Bounded storage.** At most 3,000 articles are kept. The oldest are deleted, but remembered so
-  they are never collected again. Daily topic counts are kept separately, so trends survive.
-- **Topics.** HDBSCAN on sentence embeddings found clearer topics than KMeans on the real data
-  (silhouette 0.45 against 0.26, NPMI coherence 0.42 against 0.36). Both are evaluated on every
-  re-fit and shown in the Explorer.
-- **Concurrency.** Each stage holds a Postgres advisory lock, so a laptop and GitHub Actions never
-  process the same stage at the same time.
+-   Collects cricket news from accessible sources.
+-   Filters articles for T20 relevance and removes duplicates.
+-   Extracts entities, keywords, and sentiment signals.
+-   Generates semantic embeddings for news articles.
+-   Discovers groups of related articles using HDBSCAN.
+-   Compares HDBSCAN with a K-Means baseline.
+-   Tracks topic activity and trends over time.
+-   Presents results through a React dashboard backed by a FastAPI API.
+-   Supports scheduled pipeline runs through GitHub Actions.
 
-## Branches
+## System Architecture
 
-`web-crawler` → `database` → `nlp` → `cluster` → `dashboard`, each merged into `main` in turn.
+``` mermaid
+flowchart TD
+    A[Cricket News Sources] --> B[Web Crawler]
+    B --> C[Validation and Deduplication]
+    C --> D[NLP Processing]
+    D --> E[Semantic Embeddings]
+    E --> F[Topic Clustering]
+    F --> G[Topic and Trend Statistics]
+    G --> H[(Neon PostgreSQL + pgvector)]
+    H --> I[FastAPI]
+    I --> J[React Dashboard]
+    K[GitHub Actions] --> B
+```
+
+## Technology Stack
+
+  -----------------------------------------------------------------------
+  Component                           Technologies
+  ----------------------------------- -----------------------------------
+  Backend API                         Python, FastAPI, Uvicorn
+
+  Frontend                            React, Vite, React Router, Recharts
+
+  Database                            Neon PostgreSQL, pgvector, psycopg
+
+  Web crawling                        Requests, Trafilatura,
+                                      BeautifulSoup, lxml, RSS feeds,
+                                      sitemaps
+
+  NLP                                 spaCy, VADER, YAKE
+
+  Embeddings                          Sentence Transformers
+                                      (`all-MiniLM-L6-v2`)
+
+  Topic clustering                    HDBSCAN, K-Means, scikit-learn,
+                                      NumPy
+
+  Automation                          GitHub Actions
+
+  Testing                             pytest, HTTPX
+
+  Deployment                          Vercel and Neon, as documented in
+                                      the project report
+  -----------------------------------------------------------------------
+
+## Project Snapshot
+
+The technical report dated 11 October 2026 records the following
+snapshot:
+
+-   **100** stored articles
+-   **4** news sources
+-   **17** discovered topics
+-   **75** automated tests
+
+These are figures reported in the technical report, not live counters.
+
+## Topic Discovery
+
+The system represents article text as 384-dimensional semantic
+embeddings.
+
+-   **HDBSCAN** discovers dense groups of related articles and can leave
+    outliers unassigned.
+-   **K-Means** provides a baseline and assigns every article to a
+    cluster.
+-   Distinctive terms are used to label topics, while topic statistics
+    support trend visualisation.
+
+## Reported Evaluation
+
+  Metric                                        HDBSCAN     K-Means
+  ----------------------------------------- ----------- -----------
+  Silhouette score                            **0.356**       0.220
+  Davies--Bouldin index (lower is better)      **1.12**        1.26
+  NPMI topic coherence                            0.308   **0.332**
+  Article coverage                                  64%    **100%**
+
+These results are taken from the project technical report and reflect
+its documented evaluation dataset.
+
+## Installation and Local Setup
+
+### Prerequisites
+
+-   Git
+-   Python
+-   Node.js and npm
+-   A Neon PostgreSQL database configured for the project
+
+### 1. Clone the repository
+
+``` bash
+git clone <YOUR-REPOSITORY-URL>
+cd <REPOSITORY-DIRECTORY>
+```
+
+### 2. Install dependencies
+
+Install the Python dependencies using the dependency file included in
+the repository. For example:
+
+``` bash
+pip install -r requirements.txt
+```
+
+If the frontend has its own `package.json`, install its dependencies
+from the frontend directory:
+
+``` bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Configure the database connection and other required settings using the
+variable names expected by the code. Keep credentials and `.env` files
+out of version control. Use `.env.example` if the repository includes
+one.
+
+### 4. Run the application
+
+Use the backend and frontend commands defined in the repository. A
+typical FastAPI development command may look like:
+
+``` bash
+uvicorn <python_module>:app --reload
+```
+
+Start the frontend from its directory:
+
+``` bash
+npm run dev
+```
+
+**Note:** Replace placeholders and example commands with the actual
+repository URL, module path, and project-specific setup instructions.
+
+## Limitations
+
+-   The documented dataset is relatively small.
+-   Some news sites returned HTTP 403 during reported collection
+    attempts.
+-   Keyword-based relevance filtering may miss relevant articles.
+-   General-purpose sentiment analysis may not fully understand
+    cricket-specific language.
+-   Topic labels and trend analysis may improve with more data and a
+    longer history.
+
+## Future Improvements
+
+-   Improve T20 relevance filtering with a trained classifier.
+-   Use cricket-aware sentiment analysis.
+-   Improve topic labels and article summaries.
+-   Add semantic search and emerging-topic alerts.
+-   Expand source coverage responsibly.
+
+## Data Sources
+
+The technical report documents articles collected from:
+
+-   [Wisden](https://wisden.com/)
+-   [Hindustan Times](https://www.hindustantimes.com/)
+-   [CricTracker](https://www.crictracker.com/)
+-   [Cricket Addictor](https://cricketaddictor.com/)
+
+The crawler should respect source access rules, request limits, and
+terms of use; it does not aim to bypass access controls.
+
+## Author
+
+**Sidharth K** · [GitHub](https://github.com/S1DHARTHK)
+
+## License
+
+No license is specified for this project. Add a `LICENSE` file if you
+intend to publish the project for reuse or contributions.
